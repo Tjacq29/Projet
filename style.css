@@ -47,7 +47,7 @@ a {
     -webkit-transform: translateZ(0);
     backface-visibility: hidden;
     transform: translateZ(0);
-    background: #1B2030 url(https://images.unsplash.com/photo-1731532034431-be28681ed7b7?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MzQwMzk5NDF8&ixlib=rb-4.0.3&q=85) 50% 0 no-repeat;
+    background: #1B2030 url(https://thrivenextgen.com/wp-content/uploads/AdobeStock_162765779_45-scaled.webp) 50% 0 no-repeat;
     background-size: 100%;
     background-attachment: fixed;
     animation: grow 360s linear 10ms infinite;
@@ -184,11 +184,36 @@ dialog a {
     color: #333;
 }
 
-.twtr {
-    margin-top: 100px;
+footer {
+    background: #1B2030;
+    color: #eee;
+    text-align: center;
+    padding: 15px 10px;
+    border-radius: 0;
+    width: 100%;
+    height: 80px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-.btn.twtr:after {
-    content: "\1D54F";
-    padding-left: 5px;
+.footer-content p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.footer-content nav {
+    margin-top: 5px;
+}
+
+.footer-content a {
+    color: #aaa;
+    text-decoration: none;
+    font-size: 14px;
+    margin: 0 8px;
+}
+
+.footer-content a:hover {
+    color: #fff;
+    text-decoration: underline;
 }
