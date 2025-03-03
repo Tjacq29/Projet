@@ -59,6 +59,7 @@ a {
     color: #eee;
 }
 
+
 .menu {
     display: block;
     width: 40px;
@@ -107,7 +108,7 @@ a {
 }
 
 .info {
-    width: 100%;
+    width:100%;
     padding: 15% 10% 0 10%;
     text-align: center;
 }
@@ -216,4 +217,11 @@ footer {
 .footer-content a:hover {
     color: #fff;
     text-decoration: underline;
+}
+.login-icon svg {
+    text-decoration: none;
+    display: inline-flex;
+    margin: 20px;
+    height: 40px;
+    margin-left: -12px;
 }
