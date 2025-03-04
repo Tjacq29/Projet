@@ -5,26 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription - ORFI</title>
-    <link rel="stylesheet" href="signup.css">
+    <link rel="stylesheet" href="../css/signup.css">
 </head>
 
 <body>
 
-    <!-- HEADER avec ORFI et Menu -->
+    <!-- HEADER -->
     <div class="header">
         <div class="nav-container">
-            <!-- Logo ORFI -->
+            <!-- Logo ORFI encadré -->
             <div class="sides">
                 <a href="index.html" class="logo">ORFI</a>
-            </div>
-
-            <!-- Icône de connexion -->
-            <div class="sides login-icon">
-                <a href="login.html">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24" fill="white">
-                        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 2c1.656 0 3 1.344 3 3s-1.344 3-3 3-3-1.344-3-3 1.344-3 3-3zm0 16a7.978 7.978 0 0 1-6-2.688c.03-1.992 4-3.094 6-3.094s5.97 1.102 6 3.094A7.978 7.978 0 0 1 12 20z"/>
-                    </svg>
-                </a>
             </div>
 
             <!-- Menu déroulant -->
@@ -41,18 +32,30 @@
 
             <form action="dashboard.html" method="POST">
                 <div class="input-group">
+                    <label for="firstname">Prénom</label>
+                    <input type="text" id="firstname" name="firstname" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="lastname">Nom</label>
+                    <input type="text" id="lastname" name="lastname" required>
+                </div>
+
+                <div class="input-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required>
                 </div>
 
-                <div class="input-group">
+                <div class="input-group password-group">
                     <label for="password">Mot de passe</label>
                     <input type="password" id="password" name="password" required>
+                    <span class="toggle-password" onclick="togglePassword('password')">👁</span>
                 </div>
 
-                <div class="input-group">
+                <div class="input-group password-group">
                     <label for="confirm-password">Confirmer le mot de passe</label>
                     <input type="password" id="confirm-password" name="confirm-password" required>
+                    <span class="toggle-password" onclick="togglePassword('confirm-password')">👁</span>
                 </div>
 
                 <button type="submit" class="btn">S'inscrire</button>
@@ -64,12 +67,24 @@
 
     <!-- MENU DÉROULANT -->
     <dialog id="menuDialog">
-        <a href="#">Accueil</a>
-        <a href="#">Services</a>
-        <a href="#">Contact</a>
+        <a href="index.html">Accueil</a>
+        <a href="#">Tableau</a>
+        <a href="#">Organigramme</a>
     </dialog>
 
-    <script src="script.js"></script>
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 ORFI. Tous droits réservés.</p>
+            <nav>
+                <a href="#">À propos</a> |
+                <a href="#">Contact</a> |
+                <a href="#">Mentions légales</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script src="signup.js"></script>
 
 </body>
 
