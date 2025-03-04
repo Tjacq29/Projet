@@ -1,0 +1,167 @@
+/* ---- GLOBAL ---- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Montserrat", sans-serif;
+}
+
+/* ---- BODY ---- */
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(27,32,48,1)), 
+                url('https://thrivenextgen.com/wp-content/uploads/AdobeStock_162765779_45-scaled.webp') 
+                no-repeat center center/cover;
+}
+
+/* ---- HEADER ---- */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    background: #1B2030;
+    color: #eee;
+    width: 100%;
+}
+
+/* Conteneur du header */
+.nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 90%;
+    max-width: 1200px;
+}
+
+/* ---- LOGO ORFI ---- */
+.logo {
+    color: white !important;
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+/* ---- MENU (à droite) ---- */
+.menu {
+    display: block;
+    width: 40px;
+    height: 30px;
+    border: 2px solid white;
+    border-radius: 3px;
+    position: relative;
+}
+
+/* ---- ICONES MENU (blanches) ---- */
+.menu:after {
+    content: "";
+    display: block;
+    width: 20px;
+    height: 3px;
+    background: white;
+    position: absolute;
+    margin: 0 auto;
+    top: 5px;
+    left: 0;
+    right: 0;
+    box-shadow: 0 8px, 0 16px;
+}
+
+/* ---- FORMULAIRE D'INSCRIPTION ---- */
+.signup-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+}
+
+.signup-box {
+    background: rgba(27, 32, 48, 0.9);
+    padding: 30px;
+    width: 350px;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+h2 {
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+/* ---- CHAMPS INPUT ---- */
+.input-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.input-group label {
+    color: #ffffff;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    font-size: 16px;
+    background: #222;
+    color: white;
+    outline: none;
+}
+
+/* ---- BOUTON ---- */
+.btn {
+    width: 100%;
+    padding: 10px;
+    background: #1B2030;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out, transform 0.2s;
+}
+
+.btn:hover {
+    background: #333;
+    transform: scale(1.05);
+}
+
+/* ---- MENU DÉROULANT ---- */
+dialog {
+    display: block;
+    inset: 0;
+    transition: opacity 0.5s;
+    border-radius: 3px;
+    padding: 20px;
+    box-shadow: 0 0 10px 0 #000a;
+    background: #fffd;
+    border: 0;
+    min-width: 60vw;
+}
+
+dialog:not([open]) {
+    pointer-events: none;
+    opacity: 0;
+}
+
+dialog::backdrop {
+    backdrop-filter: blur(0.25rem);
+}
+
+dialog a {
+    font-size: 1.4em;
+    display: block;
+    text-align: center;
+    margin: 10px 15px;
+    padding: 5px;
+    font-weight: 600;
+    color: #333;
+}
