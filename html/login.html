@@ -15,7 +15,7 @@
         <div class="nav-container">
             <!-- Logo ORFI encadré -->
             <div class="sides">
-                <a href="index.html" class="logo">ORFI</a>
+                <a href="../html/index.html" class="logo">ORFI</a>
             </div>
 
             <!-- Menu déroulant -->
@@ -30,7 +30,7 @@
         <div class="login-box">
             <h2>Connexion</h2>
 
-            <form action="dashboard.html" method="POST">
+            <form action="../php/login.php" method="POST">
                 <div class="input-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required>
@@ -45,7 +45,8 @@
                     <a href="#">Mot de passe oublié ?</a>
                 </div>
 
-                <button type="submit" class="btn">Se connecter</button>
+                <button type="submit" class="btn" onclick="console.log('Click détecté depuis HTML !')">Se connecter</button>
+
 
                 <p class="signup-text">Pas encore de compte ? <a href="signup.html">S'inscrire</a></p>
             </form>
@@ -54,7 +55,7 @@
 
     <!-- MENU DÉROULANT -->
     <dialog id="menuDialog">
-        <a href="index.html">Accueil</a>
+        <a href="../html/index.html">Accueil</a>
         <a href="#">Tableau</a>
         <a href="#">Organigramme</a>
     </dialog>
@@ -71,8 +72,12 @@
         </div>
     </footer>
 
-    <script src="login.js"></script>
+    <script src="../js/login.js"></script>
 
+    <script>
+        console.log("Script login.js chargé !");
+    </script>
+    
 </body>
 
 </html>

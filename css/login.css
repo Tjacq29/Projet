@@ -110,7 +110,7 @@ body {
     padding: 30px;
     width: 350px;
     border-radius: 10px;
-    backdrop-filter: blur(10px);
+    /*backdrop-filter: blur(10px);*/
     box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     text-align: center;
 }
@@ -290,4 +290,14 @@ form {
 .options a:hover,
 .signup-text a:hover {
     color: #fff;
+}
+
+input {
+    position: relative;
+    z-index: 10;
+}
+button {
+    position: relative;
+    z-index: 1000;
+    pointer-events: auto !important;
 }
