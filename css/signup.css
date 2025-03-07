@@ -33,7 +33,6 @@ body {
     padding: 30px;
     width: 400px;
     border-radius: 10px;
-    backdrop-filter: blur(10px);
     box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     text-align: center;
 }
@@ -223,3 +222,18 @@ dialog[open] {
     opacity: 1;
     transform: translate(-50%, -50%);
 }
+
+.input-group input {
+    pointer-events: auto !important;
+    user-select: auto !important;
+    opacity: 1 !important;
+    position: relative !important; /* Ajout */
+    z-index: 2 !important; /* Ajout */
+}
+
+input {
+    pointer-events: auto !important;
+    user-select: auto !important;
+    opacity: 1 !important;
+}
+

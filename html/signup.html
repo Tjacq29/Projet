@@ -30,7 +30,7 @@
         <div class="signup-box">
             <h2>Inscription</h2>
 
-            <form action="../html/dashboard.html" method="POST">
+            <form action="http://localhost/Projet/php/signup.php" method="POST">
                 <div class="input-group">
                     <label for="firstname">Prénom</label>
                     <input type="text" id="firstname" name="firstname" required>
@@ -53,12 +53,12 @@
                 </div>
 
                 <div class="input-group password-group">
-                    <label for="confirm-password">Confirmer le mot de passe</label>
-                    <input type="password" id="confirm-password" name="confirm-password" required>
-                    <span class="toggle-password" onclick="togglePassword('confirm-password')">👁</span>
+                    <label for="confirm_password">Confirmer le mot de passe</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required>
+                    <span class="toggle-password" onclick="togglePassword('confirm_password')">👁</span>
                 </div>
 
-                <button type="submit" class="btn">S'inscrire</button>
+                <button type="submit" name="submit" class="btn">S'inscrire</button>
 
                 <p class="login-text">Déjà un compte ? <a href="../html/login.html">Se connecter</a></p>
             </form>
