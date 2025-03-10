@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Tableau des Acteurs</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h2 class="mb-4">Tableau des Acteurs</h2>
+        <a class="btn btn-primary" href="create_acteur.html" role="button">Ajouter un Acteur</a>
+        
+        <table class="table" id="table-acteurs">    
+            <thead>
+                <tr>
+                    <th>ID Acteur</th>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Âge</th>
+                    <th>Rôle Entreprise</th>
+                    <th>Secteur</th>
+                    <th>ID du Supérieur</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Le tableau sera rempli dynamiquement via AJAX -->
+            </tbody>
+        </table>
+
+        <button class="btn btn-success btn-sm" onclick="generateOrganigram()">Générer l'Organigramme</button>
+    </div>
+
+    <script src="../js/dashboard_script.js"></script>
+</body>
+</html>

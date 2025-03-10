@@ -33,15 +33,4 @@ document.querySelector("form").addEventListener("submit", function(event) {
     console.log("Formulaire soumis !");
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-    const submitButton = document.querySelector("button[type='submit']");
 
-    if (submitButton) {
-        console.log("Bouton détecté !");
-        submitButton.addEventListener("click", function () {
-            console.log("Click détecté !");
-        });
-    } else {
-        console.error("⚠️ Bouton submit non trouvé !");
-    }
-});
