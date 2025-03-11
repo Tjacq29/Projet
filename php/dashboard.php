@@ -1,7 +1,7 @@
 <?php
 include 'config.php';
 
-// 🔹 Requête SQL avec une jointure pour récupérer l'ID du supérieur
+// 🔹 requete select pour récuperer les acteurs et leurs sup
 $sql = "SELECT a.id_acteur, a.nom, a.prenom, a.age, a.role_entreprise, a.secteur, 
                r.id_acteur_superieur
         FROM acteur a

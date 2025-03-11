@@ -1,86 +1,67 @@
-fetch('http://localhost/Projet/php/organigramme.php')
-    .then(response => response.json())
-    .then(data => {
-        console.log(" Données récupérées :", data); // Vérification
+document.addEventListener('DOMContentLoaded', function () {
+    var $ = go.GraphObject.make;
+    
+    var diagram = $(go.Diagram, "organigramme", {
+        layout: $(go.TreeLayout, { angle: 90, layerSpacing: 30 }),
+        "undoManager.isEnabled": true
+    });
 
-        // Transformation des données en arbre
-        const actors = {};
-        data.forEach(d => {
-            actors[d.id_acteur] = {
-                id: d.id_acteur,
-                name: d.nom + ' ' + d.prenom,
-                role: d.role_entreprise || "Non défini",
-                children: []
-            };
-        });
-
-        data.forEach(d => {
-            if (d.id_acteur_superieur && actors[d.id_acteur_superieur]) {
-                actors[d.id_acteur_superieur].children.push(actors[d.id_acteur]);
-            }
-        });
-
-        // Trouver la racine (CEO)
-        const rootActor = data.find(d => d.id_acteur_superieur === null);
-        if (!rootActor) {
-            console.error(" Aucune racine trouvée !");
-            return;
+    // Fonction pour récupérer la couleur en fonction du rôle
+    function getColor(role) {
+        switch (role) {
+            case 'Directeur Général': return "#FEBA00";
+            case 'Responsable': return "#679DDA";
+            case 'Manager': return "#58ADA7";
+            default: return "#A2DAFF";
         }
+    }
 
-        const root = d3.hierarchy(actors[rootActor.id_acteur]);
-
-        // Dimensions du graphe
-        const width = 1000, height = 600;
-
-        const treeLayout = d3.tree().size([width - 200, height - 200]);
-        treeLayout(root);
-
-        // Créer le SVG et centrer le graphe
-        const svg = d3.select("svg")
-            .attr("width", width)
-            .attr("height", height)
-            .append("g")
-            .attr("transform", "translate(50,50)");
-
-        // Ajouter les liens (traits)
-        svg.selectAll(".link")
-            .data(root.links())
-            .enter().append("path")
-            .attr("class", "link")
-            .attr("d", d3.linkVertical()
-                .x(d => d.x)
-                .y(d => d.y)
+    // Modèle des nœuds
+    diagram.nodeTemplate = $(go.Node, "Auto",
+        { click: onNodeClick }, // Événement au clic
+        $(go.Shape, "RoundedRectangle", { strokeWidth: 2, fill: "white" },
+            new go.Binding("fill", "role", getColor)
+        ),
+        $(go.Panel, "Table",
+            $(go.RowColumnDefinition, { row: 0, sizing: go.RowColumnDefinition.None }),
+            $(go.TextBlock, { row: 0, margin: 5, font: "bold 14px Poppins", stroke: "#333" },
+                new go.Binding("text", "nom")
+            ),
+            $(go.TextBlock, { row: 1, margin: 5, font: "12px Poppins", stroke: "#666" },
+                new go.Binding("text", "role")
             )
-            .style("fill", "none")
-            .style("stroke", "#555")
-            .style("stroke-width", "2px");
+        )
+    );
 
-        // Ajouter les nœuds (cercles)
-        const nodes = svg.selectAll(".node")
-            .data(root.descendants())
-            .enter().append("g")
-            .attr("class", "node")
-            .attr("transform", d => `translate(${d.x},${d.y})`);
+    // Modèle des liens
+    diagram.linkTemplate = $(go.Link,
+        { routing: go.Link.Orthogonal, corner: 5 },
+        $(go.Shape, { stroke: "#686E76", strokeWidth: 1 })
+    );
 
-        nodes.append("circle")
-            .attr("r", 15)
-            .style("fill", d => d.depth === 0 ? "#ff5733" : "#69b3a2")
-            .style("stroke", "#333")
-            .style("stroke-width", "2px");
+    // Charger les données depuis PHP
+    fetch('../php/organigramme.php')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Données reçues :", data);
+            diagram.model = new go.TreeModel(data);
+        })
+        .catch(error => console.error('Erreur lors du chargement des données:', error));
 
-        // Ajouter le texte (Nom + Rôle)
-        nodes.append("text")
-            .attr("dy", -25) // Ajuste la position au-dessus du cercle
-            .attr("text-anchor", "middle")
-            .style("font-size", "14px")
-            .style("fill", "#333")
-            .text(d => d.data.name);
-
-        nodes.append("text")
-            .attr("dy", 25) // Ajuste la position sous le cercle
-            .attr("text-anchor", "middle")
-            .style("font-size", "12px")
-            .style("fill", "#666")
-            .text(d => d.data.role);
-    })
-    .catch(error => console.error(" Erreur lors de la récupération des données :", error));
+    // Fonction au clic sur un nœud
+    function onNodeClick(e, node) {
+        var data = node.data;
+        console.log("Acteur sélectionné :", data); // Vérifie que les données sont bien là
+    
+        var infoDiv = document.getElementById("actor-info");
+        infoDiv.innerHTML = `
+            <h3>${data.nom} ${data.prenom}</h3>
+            <p><strong>Âge:</strong> ${data.age ? data.age : "Non renseigné"}</p>
+            <p><strong>Rôle:</strong> ${data.role}</p>
+            <p><strong>Secteur:</strong> ${data.secteur ? data.secteur : "Non renseigné"}</p>
+            <p><strong>Subordonnés:</strong> ${diagram.findTreeChildrenNodes(node).count}</p>
+        `;
+        infoDiv.style.display = "block";
+    }
+}
+);      

@@ -1,11 +1,11 @@
 document.addEventListener("DOMContentLoaded", function () {
-    loadActeurs();
+    loadActeurs(); // on appelle cette fonction directe au chargement de la page pour récup la liste des acteurs et remplir le tableau
 
-    document.getElementById("create-acteur-form")?.addEventListener("submit", function (event) {
+    document.getElementById("create-acteur-form")?.addEventListener("submit", function (event) { // utlisateur clique sur le bouton submit
         event.preventDefault();
         const formData = new FormData(this);
 
-        fetch("../php/create_acteur.php", {
+        fetch("../php/create_acteur.php", {// requete ajax envoi les données a create_php sans recharger la page
             method: "POST",
             body: formData
         })
@@ -46,11 +46,11 @@ function loadActeurs() {
 
 function removeActeur(id) {
     if (confirm("Êtes-vous sûr de vouloir supprimer cet acteur ?")) {
-        fetch(`../php/remove_acteur.php?id_acteur=${id}`)
+        fetch(`../php/remove_acteur.php?id_acteur=${id}`) // l'utilisateur envoi l'ID acteur a remove_acteur.php
         .then(response => response.json())
         .then(data => {
             alert(data.message);
-            if (data.success) loadActeurs();
+            if (data.success) loadActeurs();// actualiser la liste des acteurs
         })
         .catch(error => console.error("Erreur lors de la suppression :", error));
     }
