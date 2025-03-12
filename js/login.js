@@ -29,8 +29,3 @@ dialog.addEventListener("click", ({ target }) => {
         dialog.close("dismiss");
     }
 });
-document.querySelector("form").addEventListener("submit", function(event) {
-    console.log("Formulaire soumis !");
-});
-
-
