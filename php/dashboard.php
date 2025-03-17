@@ -1,28 +1,40 @@
 <?php
 include 'config.php';
 
-// 🔹 requete select pour récuperer les acteurs et leurs sup
-$sql = "SELECT a.id_acteur, a.nom, a.prenom, a.age, a.role_entreprise, a.secteur, 
-               r.id_acteur_superieur
+// Définition des en-têtes HTTP pour retourner du JSON
+header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Origin: *");
+
+// Requête SQL pour récupérer les acteurs et leurs relations hiérarchiques
+$sql = "SELECT 
+            a.id_acteur, 
+            a.nom, 
+            a.prenom, 
+            a.age, 
+            a.role_entreprise, 
+            a.secteur, 
+            r.id_acteur_superieur
         FROM acteur a
         LEFT JOIN relation_hierarchique r ON a.id_acteur = r.id_acteur_source";
 
-$result = $pdo->query($sql);
+try {
+    $stmt = $pdo->query($sql);
+    if (!$stmt) {
+        throw new Exception("Erreur SQL: " . $pdo->errorInfo()[2]);
+    }
 
-if (!$result) {
-    die(json_encode(["success" => false, "message" => "Erreur SQL: " . $pdo->errorInfo()[2]]));
+    $acteurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Correction des valeurs NULL pour éviter les erreurs
+    foreach ($acteurs as &$acteur) {
+        if ($acteur["id_acteur_superieur"] === null) {
+            $acteur["id_acteur_superieur"] = ""; // Les patrons doivent avoir ""
+        }
+    }
+
+    echo json_encode($acteurs, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+} catch (Exception $e) {
+    echo json_encode(["success" => false, "error" => $e->getMessage()]);
 }
-
-// Convertir le résultat en JSON pour le JavaScript
-$acteurs = $result->fetchAll(PDO::FETCH_ASSOC);
-echo json_encode($acteurs);
 ?>
-session_start();
-if (!isset($_SESSION["user_id"])) {
-    header("Location: login.html");
-    exit();
-}
-
-echo "Bienvenue, " . $_SESSION["user_name"] . " !";
-?>
-<a href="logout.php">Déconnexion</a>
