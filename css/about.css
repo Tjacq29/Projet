@@ -155,9 +155,9 @@ dialog {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 50%;
+    width: auto;
     min-width: 300px;
-    height: 200px;
+    height: auto;
     border-radius: 10px;
     padding: 20px;
     background: rgba(27, 32, 48, 0.95);
@@ -168,12 +168,16 @@ dialog {
     left: 50%;
     transform: translate(-50%, -50%);
     opacity: 0;
-    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    max-width: 90vw;
+    overflow: hidden; 
+    white-space: normal; 
 }
 
 dialog[open] {
     opacity: 1;
-    transform: translate(-50%, -50%);
+    visibility: visible;
 }
 
 dialog a {
@@ -184,13 +188,14 @@ dialog a {
     font-weight: 600;
     color: white;
     text-decoration: none;
+    background: transparent;
+    width: 100%;
 }
 
 dialog a:hover {
     text-decoration: underline;
     color: #ddd;
 }
-
 /* ---- FOOTER BIEN EN BAS ---- */
 footer {
     background: #1B2030;
