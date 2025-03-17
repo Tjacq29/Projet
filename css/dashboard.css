@@ -1,0 +1,257 @@
+/* ---- GLOBAL ---- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Montserrat", sans-serif;
+}
+
+/* ---- BODY ---- */
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(27,32,48,1)), 
+                url('https://thrivenextgen.com/wp-content/uploads/AdobeStock_162765779_45-scaled.webp') 
+                no-repeat center center/cover;
+    background-size: cover;
+}
+
+/* ---- HEADER ---- */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 80px;
+    background: #1B2030;
+    width: 100%;
+    padding: 0 20px;
+}
+
+/* ---- LOGO ORFI ---- */
+.logo {
+    border: 2px solid white;
+    border-radius: 3px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1.2em;
+    height: 40px;
+    padding: 5px 15px;
+    color: white;
+}
+
+/* ---- MENU ---- */
+.menu {
+    display: flex;
+    width: 40px;
+    height: 30px;
+    border: 2px solid white; /* Bordure blanche */
+    border-radius: 3px;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    transition: border 0.3s ease-in-out;
+}
+
+.menu:after {
+    content: "";
+    display: block;
+    width: 20px;
+    height: 3px;
+    background: white; /* Barres en blanc */
+    position: absolute;
+    margin: 0 auto;
+    top: 5px;
+    left: 0;
+    right: 0;
+    box-shadow: 
+        0 8px white,  /* Barre du milieu */
+        0 16px white; /* Barre du bas */
+    transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+.menu:hover:after {
+    background: #8A2BE2; /* Violet (ou autre couleur que tu veux) */
+    box-shadow: 
+        0 8px #8A2BE2,  
+        0 16px #8A2BE2;
+}
+
+.sides {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.logo {
+    border: 2px solid white;
+    border-radius: 3px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1.2em;
+    height: 40px;
+    padding: 5px 15px;
+    color: white;
+}
+/* ---- CONTAINER PRINCIPAL ---- */
+.container {
+    background: rgba(27, 32, 48, 0.95);
+    padding: 40px;
+    border-radius: 15px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+    margin: 60px auto;
+    text-align: center;
+    color: white;
+    width: 90%;
+    max-width: 1200px;
+}
+
+/* ---- TITRE DU TABLEAU ---- */
+h2 {
+    text-align: center;
+    color: #71aff6;
+    margin-bottom: 25px;
+    font-size: 28px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ---- TABLEAU ---- */
+.table {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 20px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* ---- EN-TÊTE DU TABLEAU ---- */
+.table thead {
+    background: rgba(44, 62, 80, 0.95);
+    color: white;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.table th {
+    padding: 15px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* ---- CORPS DU TABLEAU ---- */
+.table tbody tr {
+    transition: background 0.3s ease-in-out;
+}
+
+/* Alternance des couleurs pour une meilleure lisibilité */
+.table tbody tr:nth-child(odd) {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ---- CELLULES ---- */
+.table td {
+    padding: 14px;
+    text-align: center;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ---- EFFET DE SURVOL ---- */
+.table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    transition: background 0.3s ease-in-out;
+}
+
+/* ---- STYLE DES BOUTONS ---- */
+.btn {
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    font-size: 15px;
+    transition: 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+/* ---- BOUTON "AJOUTER UN ACTEUR" ---- */
+.btn-primary {
+    background: #71aff6;
+    border: none;
+    transition: background 0.3s ease-in-out, transform 0.2s;
+}
+
+.btn-primary:hover {
+    background: #5095e2;
+    transform: scale(1.05);
+}
+
+/* ---- BOUTON "GÉNÉRER L'ORGANIGRAMME" ---- */
+.btn-success {
+    background: #2ecc71;
+    border: none;
+    margin-top: 25px;
+    padding: 12px 18px;
+    font-size: 16px;
+    transition: background 0.3s ease-in-out, transform 0.2s;
+}
+
+.btn-success:hover {
+    background: #27ae60;
+    transform: scale(1.05);
+}
+
+/* ---- FOOTER ---- */
+footer {
+    background: #1B2030;
+    color: #eee;
+    text-align: center;
+    padding: 15px 10px;
+    width: 100%;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: auto;
+}
+
+.footer-content p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.footer-content nav {
+    margin-top: 5px;
+}
+
+.footer-content a {
+    color: #aaa;
+    text-decoration: none;
+    font-size: 14px;
+    margin: 0 8px;
+}
+
+.footer-content a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
