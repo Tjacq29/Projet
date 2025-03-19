@@ -3,15 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Organigramme de l'Entreprise</title>
-    <script src="https://cdn.jsdelivr.net/npm/gojs@3.0.19/release/go.js"></script>
-    <link rel="stylesheet" href="../css/style.css">
+    <title>Organigramme Stylisé avec GoJS</title>
+
+    <!-- Importation de GoJS -->
+    <script src="https://unpkg.com/gojs/release/go.js"></script>
+
+    <!-- Importation du CSS -->
+    <link rel="stylesheet" href="../css/organigramme.css">
 </head>
 <body>
-    <h1>Organigramme de l'Entreprise</h1>
-    <div id="organigramme" style="width: 100%; height: 600px; border: 1px solid black;"></div>
-    <div id="actor-info"></div>
 
+    <h2 style="text-align:center;"> Organigramme de l'Entreprise</h2>
+    <div id="diagramDiv"></div>
+
+    <!-- Fenêtre modale pour afficher les informations de l'acteur -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title"></h2>
+            <p><strong>Poste :</strong> <span id="modal-role"></span></p>
+            <p><strong>Âge :</strong> <span id="modal-age"></span></p>
+            <p><strong>Secteur :</strong> <span id="modal-sector"></span></p>
+        </div>
+    </div>
+
+    <!-- Importation du script JS -->
     <script src="../js/organigramme.js"></script>
+
 </body>
 </html>
