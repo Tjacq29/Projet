@@ -73,7 +73,28 @@
     <script>
         console.log("Script login.js chargé !");
     </script>
-    
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Empêche le rechargement de la page
+        
+            var formData = new FormData(this);
+        
+            fetch("../php/login.php", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    sessionStorage.setItem("userId", data.userId); // ✅ Stocke l'ID utilisateur
+                    window.location.href = "../html/index.html"; // ✅ Redirige après connexion
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error("Erreur :", error));
+        });
+    </script>
 </body>
 
 </html>

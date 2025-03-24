@@ -1,4 +1,5 @@
 <?php
+session_start();
 include 'config.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -6,21 +7,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST["password"];
 
     if (!empty($email) && !empty($password)) {
-        // Requête sécurisée avec prepared statements
         $stmt = $pdo->prepare("SELECT * FROM utilisateur WHERE email = :email");
         $stmt->execute(['email' => $email]);
         $user = $stmt->fetch();
 
-        // Vérifier si un utilisateur existe et si le mot de passe correspond
         if ($user && password_verify($password, $user['mot_de_passe'])) {
-            echo "Vous êtes connecté !";
-            header('Location: ../html/index.html');
-            exit(); 
+            $_SESSION["userId"] = $user['id_utilisateur']; 
+            $_SESSION["nom"] = $user['nom']; 
+            $_SESSION["prenom"] = $user['prenom'];
+
+            // ✅ Retourne une réponse JSON au lieu d'une redirection PHP
+            echo json_encode(["success" => true, "userId" => $_SESSION["userId"]]);
+            exit();
         } else {
-            echo "Erreur : email ou mot de passe incorrect.";
+            echo json_encode(["success" => false, "message" => "Email ou mot de passe incorrect."]);
         }
     } else {
-        echo "Veuillez remplir tous les champs.";
+        echo json_encode(["success" => false, "message" => "Veuillez remplir tous les champs."]);
     }
 }
 ?>

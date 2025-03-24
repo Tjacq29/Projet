@@ -1,24 +1,39 @@
-function initDiagram(data) {
-    var $ = go.GraphObject.make;
+var $ = go.GraphObject.make;
+var myDiagram; // Déclaration globale pour éviter les erreurs
 
-    var diagram = $(go.Diagram, "diagramDiv", {
+// 📡 Vérifier si l'utilisateur est connecté et stocker son ID en sessionStorage
+fetch('../php/get_user.php')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            sessionStorage.setItem("userId", data.userId);
+            console.log("Utilisateur connecté, ID stocké :", data.userId);
+        } else {
+            console.error("Utilisateur non identifié :", data.message);
+            alert("Vous devez être connecté !");
+            window.location.href = "../html/login.html"; // Redirection vers la connexion
+        }
+    })
+    .catch(error => console.error("Erreur lors de la récupération de l'utilisateur :", error));
+
+function initDiagram(data) {
+    myDiagram = $(go.Diagram, "diagramDiv", { // Assignation à myDiagram
         layout: $(go.TreeLayout, { 
             angle: 90, 
-            layerSpacing: 80, //  Espacement augmenté entre les niveaux
-            nodeSpacing: 30  //  Meilleur alignement des branches
+            layerSpacing: 80, // Espacement augmenté entre les niveaux
+            nodeSpacing: 30  // Meilleur alignement des branches
         }),
         "undoManager.isEnabled": true
     });
 
     //  Définition du modèle de chaque nœud avec design amélioré
-    diagram.nodeTemplate =
+    myDiagram.nodeTemplate =
         $(go.Node, "Auto",
             { click: function(e, obj) { showModal(obj.part.data); } }, // Affichage de la modale au clic
             $(go.Shape, "RoundedRectangle", { 
                 strokeWidth: 2, 
                 stroke: "#388E3C", 
                 fill: $(go.Brush, "Linear", { 0: "#F5F5DC", 1: "#EDEADE" }), // Blanc Cassé
- 
                 width: 250, height: 70, // Taille des nœuds
                 shadowVisible: true
             }),
@@ -35,14 +50,14 @@ function initDiagram(data) {
         );
 
     // Personnalisation des liens entre les nœuds
-    diagram.linkTemplate =
+    myDiagram.linkTemplate =
         $(go.Link,
             { routing: go.Link.Orthogonal, corner: 10 },
-            $(go.Shape, { stroke: "#388E3C", strokeWidth: 2 }),  //  Lignes en vert foncé
+            $(go.Shape, { stroke: "#388E3C", strokeWidth: 2 }),  // Lignes en vert foncé
             $(go.Shape, { toArrow: "Standard", fill: "#388E3C", stroke: "#2E7D32" })
         );
 
-    diagram.model = new go.TreeModel(data);
+    myDiagram.model = new go.TreeModel(data);
 }
 
 // Fonction pour afficher la fenêtre modale
@@ -80,3 +95,50 @@ fetch('../php/dashboard.php')
         initDiagram(formattedData);
     })
     .catch(error => console.error("Erreur lors du chargement des données:", error));
+
+function saveGraph() {
+    const userId = sessionStorage.getItem("userId");
+    if (!userId) {
+        alert("Utilisateur non connecté !");
+        return;
+    }
+
+    const graphData = myDiagram.model.toJson(); // JSON des données du graphe
+
+    // 🔥 Génère une image complète du graphe
+    const imageData = myDiagram.makeImageData({ scale: 1, background: "white" }); // base64 PNG
+
+    // Convertir base64 en blob
+    fetch(imageData)
+        .then(res => res.blob())
+        .then(blob => {
+            const formData = new FormData();
+            formData.append("image", blob, "graph.png");
+            formData.append("id_utilisateur", userId);
+            formData.append("json", graphData);
+
+            return fetch("../php/save_graph_with_image.php", {
+                method: "POST",
+                body: formData
+            });
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert("Organigramme enregistré avec image complète !");
+                window.location.href = "../html/admin_view.html";
+            } else {
+                alert("Erreur : " + data.message);
+            }
+        })
+        .catch(err => {
+            console.error("Erreur :", err);
+            alert("Erreur d'enregistrement.");
+        });
+}
+
+
+
+function graph_informel() {
+    window.location.href = "../html/graph_informel.html";
+}
