@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -10,27 +11,15 @@
 
 <body>
 
-    <!-- HEADER -->
-    <div class="header">
-        <div class="nav-container">
-            <!-- Logo ORFI encadré -->
-            <div class="sides">
-                <a href="../html/index.html" class="logo">ORFI</a>
-            </div>
-
-            <!-- Menu déroulant -->
-            <div class="sides">
-                <a href="#" class="menu" id="openMenu"></a>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- FORMULAIRE DE CONNEXION -->
     <div class="login-container">
         <div class="login-box">
             <h2>Connexion</h2>
 
-            <form action="../php/login.php" method="POST">
+            <!-- ✅ FORMULAIRE CORRECT -->
+            <form id="login-form" method="post">
                 <div class="input-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required>
@@ -41,8 +30,7 @@
                     <input type="password" id="password" name="password" required>
                 </div>
 
-                <button type="submit" class="btn" onclick="console.log('Click détecté depuis HTML !')">Se connecter</button>
-
+                <button type="submit" class="btn">Se connecter</button>
 
                 <p class="signup-text">Pas encore de compte ? <a href="signup.html">S'inscrire</a></p>
             </form>
@@ -67,34 +55,8 @@
             </nav>
         </div>
     </footer>
-
     <script src="../js/login.js"></script>
 
-    <script>
-        console.log("Script login.js chargé !");
-    </script>
-    <script>
-        document.getElementById("loginForm").addEventListener("submit", function(event) {
-            event.preventDefault(); // Empêche le rechargement de la page
-        
-            var formData = new FormData(this);
-        
-            fetch("../php/login.php", {
-                method: "POST",
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    sessionStorage.setItem("userId", data.userId); // ✅ Stocke l'ID utilisateur
-                    window.location.href = "../html/index.html"; // ✅ Redirige après connexion
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => console.error("Erreur :", error));
-        });
-    </script>
+    
 </body>
-
 </html>

@@ -12,13 +12,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['mot_de_passe'])) {
-            $_SESSION["userId"] = $user['id_utilisateur']; 
-            $_SESSION["nom"] = $user['nom']; 
+            // ✅ Stocker l'utilisateur dans la session
+            $_SESSION["id_utilisateur"] = $user['id_utilisateur']; // correspond à dashboard.php
+            $_SESSION["nom"] = $user['nom'];
             $_SESSION["prenom"] = $user['prenom'];
 
-            // ✅ Retourne une réponse JSON au lieu d'une redirection PHP
-            echo json_encode(["success" => true, "userId" => $_SESSION["userId"]]);
-            exit();
+            // ✅ Réponse JSON pour le frontend
+            echo json_encode([
+                "success" => true,
+                "userId" => $_SESSION["id_utilisateur"],
+                "nom" => $_SESSION["nom"],
+                "prenom" => $_SESSION["prenom"]
+            ]);
+            exit;
         } else {
             echo json_encode(["success" => false, "message" => "Email ou mot de passe incorrect."]);
         }

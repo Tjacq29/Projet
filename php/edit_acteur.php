@@ -1,75 +1,63 @@
 <?php
+session_start();
 include 'config.php';
+header('Content-Type: application/json');
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $id_acteur = $_POST["id_acteur"];
-    $nom = $_POST["nom"];
-    $prenom = $_POST["prenom"];
-    $age = $_POST["age"];
-    $role_entreprise = $_POST["role_entreprise"];
-    $secteur = $_POST["secteur"];
-    $id_superieur = !empty($_POST["id_superieur"]) ? $_POST["id_superieur"] : NULL;
+if (!isset($_SESSION["id_utilisateur"])) {
+    echo json_encode(["success" => false, "message" => "Utilisateur non connecté"]);
+    exit();
+}
 
-    try {
-        $pdo->beginTransaction();
+$id_utilisateur = $_SESSION["id_utilisateur"];
 
-        // 🔹 Mettre à jour les informations de l'acteur
-        $sql = "UPDATE acteur 
-                SET nom = :nom, prenom = :prenom, age = :age, 
-                    role_entreprise = :role_entreprise, secteur = :secteur
-                WHERE id_acteur = :id_acteur";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            "id_acteur" => $id_acteur,
-            "nom" => $nom,
-            "prenom" => $prenom,
-            "age" => $age,
-            "role_entreprise" => $role_entreprise,
-            "secteur" => $secteur
-        ]);
+// Remplacer l'opérateur ?? par isset pour compatibilité avec les anciennes versions PHP
+$id_acteur = isset($_POST["id_acteur"]) ? $_POST["id_acteur"] : null;
+$nom = isset($_POST["nom"]) ? $_POST["nom"] : null;
+$prenom = isset($_POST["prenom"]) ? $_POST["prenom"] : null;
+$age = isset($_POST["age"]) ? $_POST["age"] : null;
+$role_entreprise = isset($_POST["role_entreprise"]) ? $_POST["role_entreprise"] : null;
+$secteur = isset($_POST["secteur"]) ? $_POST["secteur"] : null;
+$id_superieur = isset($_POST["id_superieur"]) && $_POST["id_superieur"] !== '' ? $_POST["id_superieur"] : null;
 
-        // 🔹 Vérifier si une relation hiérarchique existe déjà pour cet acteur
-        $sqlCheckRelation = "SELECT id_acteur_superieur FROM relation_hierarchique WHERE id_acteur_source = :id_acteur";
-        $stmtCheck = $pdo->prepare($sqlCheckRelation);
-        $stmtCheck->execute(["id_acteur" => $id_acteur]);
-        $existingRelation = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+try {
+    $check = $pdo->prepare("SELECT * FROM acteur WHERE id_acteur = :id_acteur AND id_utilisateur = :id_utilisateur");
+    $check->execute(["id_acteur" => $id_acteur, "id_utilisateur" => $id_utilisateur]);
 
-        if ($existingRelation) {
-            if ($id_superieur === NULL) {
-                // 🔹 Supprimer la relation si l'acteur n'a plus de supérieur
-                $sqlDeleteRelation = "DELETE FROM relation_hierarchique WHERE id_acteur_source = :id_acteur";
-                $stmtDelete = $pdo->prepare($sqlDeleteRelation);
-                $stmtDelete->execute(["id_acteur" => $id_acteur]);
-            } elseif ($existingRelation["id_acteur_superieur"] != $id_superieur) {
-                // 🔹 Mettre à jour la relation si le supérieur a changé
-                $sqlUpdateRelation = "UPDATE relation_hierarchique 
-                                      SET id_acteur_superieur = :id_superieur 
-                                      WHERE id_acteur_source = :id_acteur";
-                $stmtUpdate = $pdo->prepare($sqlUpdateRelation);
-                $stmtUpdate->execute([
-                    "id_acteur" => $id_acteur,
-                    "id_superieur" => $id_superieur
-                ]);
-            }
-        } else {
-            if ($id_superieur !== NULL) {
-                // 🔹 Ajouter une nouvelle relation si l'acteur a un supérieur
-                $sqlInsertRelation = "INSERT INTO relation_hierarchique (id_acteur_source, id_acteur_superieur) 
-                                      VALUES (:id_acteur, :id_superieur)";
-                $stmtInsert = $pdo->prepare($sqlInsertRelation);
-                $stmtInsert->execute([
-                    "id_acteur" => $id_acteur,
-                    "id_superieur" => $id_superieur
-                ]);
-            }
-        }
-
-        $pdo->commit();
-        echo json_encode(["success" => true, "message" => "Acteur modifié avec succès"]);
-
-    } catch (Exception $e) {
-        $pdo->rollBack();
-        echo json_encode(["success" => false, "message" => "Erreur : " . $e->getMessage()]);
+    if (!$check->fetch()) {
+        echo json_encode(["success" => false, "message" => "Modification interdite : acteur non trouvé ou non autorisé."]);
+        exit();
     }
+
+    // Mise à jour des infos de l’acteur
+    $stmt = $pdo->prepare("UPDATE acteur SET nom = :nom, prenom = :prenom, age = :age, 
+                          role_entreprise = :role_entreprise, secteur = :secteur 
+                          WHERE id_acteur = :id_acteur");
+    $stmt->execute([
+        "nom" => $nom,
+        "prenom" => $prenom,
+        "age" => $age,
+        "role_entreprise" => $role_entreprise,
+        "secteur" => $secteur,
+        "id_acteur" => $id_acteur
+    ]);
+
+    // Mise à jour ou insertion dans la table relation_hierarchique
+    $checkRel = $pdo->prepare("SELECT * FROM relation_hierarchique WHERE id_acteur_source = :id_acteur_source");
+    $checkRel->execute(["id_acteur_source" => $id_acteur]);
+
+    if ($checkRel->rowCount() > 0) {
+        $update = $pdo->prepare("UPDATE relation_hierarchique SET id_acteur_superieur = :id_superieur WHERE id_acteur_source = :id_acteur_source");
+    } else {
+        $update = $pdo->prepare("INSERT INTO relation_hierarchique (id_acteur_source, id_acteur_superieur) VALUES (:id_acteur_source, :id_superieur)");
+    }
+
+    $update->execute([
+        "id_superieur" => $id_superieur,
+        "id_acteur_source" => $id_acteur
+    ]);
+
+    echo json_encode(["success" => true, "message" => "Acteur modifié avec succès"]);
+} catch (Exception $e) {
+    echo json_encode(["success" => false, "message" => "Erreur : " . $e->getMessage()]);
 }
 ?>

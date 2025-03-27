@@ -1,12 +1,12 @@
 <?php
-session_start(); // Démarrer la session pour récupérer les valeurs stockées
+session_start();
 
-if (isset($_SESSION["userId"])) {
+if (isset($_SESSION['id_utilisateur'])) {
     echo json_encode([
         "success" => true,
-        "userId" => $_SESSION["userId"],
-        "nom" => $_SESSION["nom"],
-        "prenom" => $_SESSION["prenom"]
+        "userId" => $_SESSION['id_utilisateur'],
+        "nom" => $_SESSION['nom'],
+        "prenom" => $_SESSION['prenom']
     ]);
 } else {
     echo json_encode(["success" => false, "message" => "Aucun utilisateur connecté."]);
