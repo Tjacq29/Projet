@@ -237,3 +237,25 @@ input {
     opacity: 1 !important;
 }
 
+#menuDialog {
+    z-index: 1; /* ou même 0 */
+  }
+  .login-text a {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer; /* 👈 force le curseur en main */
+  }
+  #menuDialog {
+    z-index: 1;
+    display: none;
+}
+
+.signup-text a {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.signup-text a:hover {
+    color: #fff;
+}

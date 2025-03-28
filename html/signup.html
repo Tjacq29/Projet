@@ -57,14 +57,22 @@
                     <input type="password" id="confirm_password" name="confirm_password" required>
                     <span class="toggle-password" onclick="togglePassword('confirm_password')">👁</span>
                 </div>
-
+                
+                <div class="input-group">
+                    <label for="role">Rôle</label>
+                    <select id="role" name="role" required>
+                        <option value="eleve">Élève</option> 
+                        <option value="prof">Professeur</option> 
+                    </select>
+                </div>
+                
                 <button type="submit" name="submit" class="btn">S'inscrire</button>
 
                 <p class="login-text">Déjà un compte ? <a href="../html/login.html">Se connecter</a></p>
             </form>
         </div>
     </div>
-
+    
     <!-- MENU DÉROULANT -->
     <dialog id="menuDialog">
         <a href="../html/index.html">Accueil</a>

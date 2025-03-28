@@ -1,17 +1,18 @@
 var $ = go.GraphObject.make;
 var myDiagram; // Déclaration globale pour éviter les erreurs
 
-// 📡 Vérifier si l'utilisateur est connecté et stocker son ID en sessionStorage
+
 fetch('../php/get_user.php')
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             sessionStorage.setItem("userId", data.userId);
+            sessionStorage.setItem("role", data.role);
             console.log("Utilisateur connecté, ID stocké :", data.userId);
         } else {
             console.error("Utilisateur non identifié :", data.message);
             alert("Vous devez être connecté !");
-            window.location.href = "../html/login.html"; // Redirection vers la connexion
+            window.location.href = "../html/login.html";
         }
     })
     .catch(error => console.error("Erreur lors de la récupération de l'utilisateur :", error));
@@ -125,11 +126,15 @@ function saveGraph() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                alert("Organigramme enregistré avec image complète !");
-                window.location.href = "../html/admin_view.html";
-            } else {
-                alert("Erreur : " + data.message);
+                alert("Organigramme enregistré avec succès !");
+                
+                const role = sessionStorage.getItem("role");
+                if (role === "prof") {
+                    window.location.href = "../html/admin_view.html";
+                }
+                // Sinon, élève : on reste sur la page
             }
+            
         })
         .catch(err => {
             console.error("Erreur :", err);

@@ -1,62 +1,90 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion - ORFI</title>
-    <link rel="stylesheet" href="../css/login.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connexion - ORFI</title>
+  <link rel="stylesheet" href="../css/login.css" />
+  <style>
+    /* Renforce les règles pour empêcher le dialog de bloquer le lien */
+    #menuDialog {
+      z-index: 1;
+      display: none;
+    }
+
+    .signup-text a {
+      color: #bbb;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .signup-text a:hover {
+      color: #fff;
+    }
+  </style>
 </head>
 
 <body>
-
-    
-
-    <!-- FORMULAIRE DE CONNEXION -->
-    <div class="login-container">
-        <div class="login-box">
-            <h2>Connexion</h2>
-
-            <!-- ✅ FORMULAIRE CORRECT -->
-            <form id="login-form" method="post">
-                <div class="input-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-
-                <div class="input-group">
-                    <label for="password">Mot de passe</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-
-                <button type="submit" class="btn">Se connecter</button>
-
-                <p class="signup-text">Pas encore de compte ? <a href="signup.html">S'inscrire</a></p>
-            </form>
-        </div>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="nav-container">
+      <div class="sides">
+        <a href="../html/index.html" class="logo">ORFI</a>
+      </div>
+      <div class="sides">
+        <a href="#" class="menu" id="openMenu"></a>
+      </div>
     </div>
+  </div>
 
-    <!-- MENU DÉROULANT -->
-    <dialog id="menuDialog">
-        <a href="../html/index.html">Accueil</a>
-        <a href="#">Tableau</a>
-        <a href="#">Organigramme</a>
-    </dialog>
+  <!-- FORMULAIRE DE CONNEXION -->
+  <div class="login-container">
+    <div class="login-box">
+      <h2>Connexion</h2>
 
-    <!-- FOOTER -->
-    <footer>
-        <div class="footer-content">
-            <p>&copy; 2025 ORFI. Tous droits réservés.</p>
-            <nav>
-                <a href="#">À propos</a> |
-                <a href="#">Contact</a> |
-                <a href="#">Mentions légales</a>
-            </nav>
+      <form id="login-form" method="post">
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required />
         </div>
-    </footer>
-    <script src="../js/login.js"></script>
 
-    
+        <div class="input-group">
+          <label for="password">Mot de passe</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+
+        <button type="submit" class="btn">Se connecter</button>
+
+        <!-- 🔥 Ce lien fonctionne maintenant -->
+        <p class="signup-text">
+          Pas encore de compte ?
+          <a href="signup.html">S'inscrire</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- MENU DÉROULANT (corrigé pour ne plus gêner) -->
+  <dialog id="menuDialog">
+    <a href="../html/index.html">Accueil</a>
+    <a href="#">Tableau</a>
+    <a href="#">Organigramme</a>
+  </dialog>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 ORFI. Tous droits réservés.</p>
+      <nav>
+        <a href="#">À propos</a> |
+        <a href="#">Contact</a> |
+        <a href="#">Mentions légales</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="../js/login.js"></script>
 </body>
+
 </html>

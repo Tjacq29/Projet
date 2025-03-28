@@ -1,4 +1,4 @@
-<?php 
+<?php
 include 'config.php';
 
 if (isset($_POST['submit'])) {
@@ -7,8 +7,11 @@ if (isset($_POST['submit'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
+    $role = $_POST['role']; 
 
-    // Vérifier si l'email existe déjà dans la base de données
+    
+
+    // Vérifier si l'email existe déjà
     $checkEmail = $pdo->prepare("SELECT COUNT(*) FROM utilisateur WHERE email = :email");
     $checkEmail->execute(['email' => $email]);
     $emailExists = $checkEmail->fetchColumn();
@@ -17,17 +20,17 @@ if (isset($_POST['submit'])) {
         echo "Erreur : cet email est déjà utilisé.";
     } else {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $request = $pdo->prepare("INSERT INTO utilisateur (email, mot_de_passe, nom, prenom) VALUES (:email, :mot_de_passe, :nom, :prenom)");
-        $request->execute(
-            array(
-                'email' => $email,
-                'mot_de_passe' => $hashed_password, 
-                'nom' => $lastname,
-                'prenom' => $firstname
-            )
-        );
 
-        echo "Inscription réussie !";
+        $request = $pdo->prepare("INSERT INTO utilisateur (email, mot_de_passe, nom, prenom, role) 
+                                  VALUES (:email, :mot_de_passe, :nom, :prenom, :role)");
+        $request->execute([
+            'email' => $email,
+            'mot_de_passe' => $hashed_password, 
+            'nom' => $lastname,
+            'prenom' => $firstname,
+            'role' => $role
+        ]);
+
         header('Location: ../html/login.html'); 
         exit();
     }

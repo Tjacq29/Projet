@@ -1,36 +1,48 @@
-// admin_view.js
-var $ = go.GraphObject.make;
-var myDiagram;
+fetch('../php/get_saved_graph.php')
+  .then(res => res.json())
+  .then(data => {
+    if (!data.success) {
+      alert("Erreur de chargement des schémas.");
+      return;
+    }
 
-document.addEventListener("DOMContentLoaded", function () {
-    fetch("../php/get_saved_graph.php")
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const tbody = document.getElementById("schemaList");
-                tbody.innerHTML = "";
+    const tbody = document.getElementById("schemaList");
+    data.schemas.forEach(schema => {
+      const tr = document.createElement("tr");
 
-                data.schemas.forEach(schema => {
-                    const fileName = schema.nom + ".png";
-                    const imageUrl = "../schemas/img/" + fileName;
+      tr.innerHTML = `
+        <td>${schema.prenom}</td>
+        <td>${schema.nom_utilisateur}</td>
+        <td>${schema.type_schema}</td>
+        <td>${schema.date_time}</td>
+        <td><a href="../schemas/img/${schema.nom}.png" download>Télécharger</a></td>
+        <td><a href="../schemas/${schema.nom}.json" target="_blank">Voir JSON</a></td>
+        <td><button onclick="deleteSchema(${schema.id_schema})">🗑️</button></td>
+      `;
 
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>${schema.nom_utilisateur}</td>
-                        <td>${schema.prenom}</td>
-                        <td>${schema.type_schema}</td>
-                        <td>${schema.date_time}</td>
-                        <td><a href="${imageUrl}" download>Télécharger</a></td>
-                        <td><a href="${imageUrl}" target="_blank">Voir</a></td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            } else {
-                alert("Erreur : " + data.message);
-            }
-        })
-        .catch(error => {
-            console.error("Erreur lors du chargement des graphiques :", error);
-            alert("Erreur de connexion au serveur.");
-        });
-});
+      tbody.appendChild(tr);
+    });
+  });
+  function deleteSchema(id) {
+    if (!confirm("Confirmer la suppression du schéma ?")) return;
+  
+    fetch('../php/delete_schema_prof.php', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id_schema: id })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert("Schéma supprimé !");
+          location.reload();
+        } else {
+          alert("Erreur : " + data.message);
+        }
+      })
+      .catch(err => {
+        console.error("Erreur :", err);
+        alert("Erreur réseau");
+      });
+  }
+  
