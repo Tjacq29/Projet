@@ -1,0 +1,7 @@
+Array
+(
+    [id_utilisateur] => 13
+    [nom] => bre
+    [prenom] => pol
+    [role] => eleve
+)

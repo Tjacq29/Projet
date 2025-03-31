@@ -27,22 +27,26 @@ fetch('../php/get_saved_graph.php')
     if (!confirm("Confirmer la suppression du schéma ?")) return;
   
     fetch('../php/delete_schema_prof.php', {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id_schema: id })
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          alert("Schéma supprimé !");
-          location.reload();
-        } else {
-          alert("Erreur : " + data.message);
-        }
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        // pour envoyer les cookies
+        body: JSON.stringify({ id_schema: id })
       })
-      .catch(err => {
-        console.error("Erreur :", err);
-        alert("Erreur réseau");
-      });
-  }
+        .then(res => res.text()) // 👈 transforme en .text() pour voir brut
+        .then(text => {
+          console.log("🧾 Réponse brute du serveur :", text);
+          const data = JSON.parse(text); // 👈 on parse manuellement après
+          if (data.success) {
+            alert("Schéma supprimé !");
+            location.reload();
+          } else {
+            alert("Erreur : " + data.message);
+          }
+        })
+        .catch(err => {
+          console.error("❌ Erreur :", err);
+          alert("Erreur réseau ou JSON.");
+        });
+    }      
   

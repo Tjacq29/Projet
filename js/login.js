@@ -12,8 +12,10 @@ document.addEventListener("DOMContentLoaded", function () {
             body: formData,
             credentials: "include"
         })
-        .then(response => response.json())
-        .then(data => {
+        .then(response => response.text())
+        .then(text => {
+            console.log("Réponse brute du serveur :", text); // Vérifie ce que PHP renvoie après le POST
+            const data = JSON.parse(text);
             if (data.success) {
                 // Stocker l'utilisateur connecté
                 sessionStorage.setItem("userId", data.userId);

@@ -16,13 +16,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION["id_utilisateur"] = $user['id_utilisateur']; // correspond à dashboard.php
             $_SESSION["nom"] = $user['nom'];
             $_SESSION["prenom"] = $user['prenom'];
+            $_SESSION['role'] = $user['role']; // ✅ C’est ça qu’il manquait
+
 
             // ✅ Réponse JSON pour le frontend
             echo json_encode([
                 "success" => true,
                 "userId" => $_SESSION["id_utilisateur"],
                 "nom" => $_SESSION["nom"],
-                "prenom" => $_SESSION["prenom"]
+                "prenom" => $_SESSION["prenom"],
+                "role" => $user["role"] 
             ]);
             exit;
         } else {
