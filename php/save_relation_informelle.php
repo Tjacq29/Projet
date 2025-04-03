@@ -5,6 +5,14 @@ error_reporting(E_ALL);
 session_start();
 include 'config.php';
 
+// Vérifie que l'utilisateur est connecté
+if (!isset($_SESSION['id_utilisateur'])) {
+    echo json_encode(["error" => "Utilisateur non connecté"]);
+    exit();
+}
+
+$id_utilisateur = $_SESSION['id_utilisateur'];
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(["error" => "Méthode non autorisée"]);
     exit();
@@ -21,8 +29,9 @@ try {
     $sql = "INSERT INTO relation_informelle (
                 id_acteur_source, id_acteur_cible, type_relation,
                 direction_relation, impact_source_vers_cible,
-                impact_cible_vers_source, nature_relation, duree_relation
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                impact_cible_vers_source, nature_relation, duree_relation,
+                id_utilisateur
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
@@ -33,7 +42,8 @@ try {
         $data["impact_source_vers_cible"],
         $data["impact_cible_vers_source"],
         $data["nature_relation"],
-        $data["duree_relation"]
+        $data["duree_relation"],
+        $id_utilisateur
     ]);
 
     echo json_encode(["success" => true]);

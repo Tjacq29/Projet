@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Graphique Informel - Interface complète</title>
+  <script src="https://unpkg.com/gojs/release/go.js"></script>
+  <style>
+    body {
+      display: flex;
+      font-family: sans-serif;
+      margin: 0;
+      height: 100vh;
+    }
+    #sidebar {
+      width: 250px;
+      background-color: #f9f9f9;
+      border-right: 1px solid #ccc;
+      padding: 20px;
+    }
+    #sidebar h3 {
+      margin-top: 0;
+    }
+    #sidebar label {
+      display: block;
+      margin-top: 10px;
+    }
+    #myDiagramDiv {
+      flex: 1;
+      background-color: #f4f4f4;
+    }
+    select, input[type=text] {
+      width: 100%;
+      padding: 5px;
+    }
+    button {
+      width: 100%;
+      margin-top: 15px;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="sidebar">
+    <h3>Nouvelle Relation</h3>
+    <label>Type</label>
+    <input type="text" id="typeRelation" placeholder="ex: Mentorat">
+
+    <label>Nature</label>
+    <select id="natureRelation">
+      <option value="Positive">Positive</option>
+      <option value="Négative">Négative</option>
+      <option value="Neutre">Neutre</option>
+    </select>
+
+    <label>Impact</label>
+    <select id="impactRelation">
+      <option value="Faible">Faible</option>
+      <option value="Moyen">Moyen</option>
+      <option value="Fort">Fort</option>
+    </select>
+
+    <button onclick="activateLinkMode()">Activer mode lien</button>
+    <p id="status"></p>
+  </div>
+
+  <div id="myDiagramDiv"></div>
+
+  <script>
+    let diagram;
+    let sourceNode = null;
+
+    const $ = go.GraphObject.make;
+
+    function init() {
+      diagram = $(go.Diagram, "myDiagramDiv", {
+        layout: $(go.TreeLayout, { angle: 90, layerSpacing: 100 }),
+        "undoManager.isEnabled": true,
+        "clickCreatingTool.archetypeNodeData": { label: "Nouvel Acteur" },
+        "clickCreatingTool.insertPart": function(loc) {
+          return go.ClickCreatingTool.prototype.insertPart.call(this, loc);
+        }
+      });
+
+      diagram.nodeTemplate = $(go.Node, "Auto",
+        {
+          click: (e, node) => handleNodeClick(node.part.data)
+        },
+        $(go.Shape, "RoundedRectangle", { fill: "#e0ecff", stroke: "#6193d6", strokeWidth: 2 }),
+        $(go.TextBlock, { margin: 8, font: "bold 14px sans-serif" }, new go.Binding("text", "label"))
+      );
+
+      diagram.linkTemplate = $(go.Link,
+        { routing: go.Link.Orthogonal, corner: 10, curve: go.Link.Normal },
+        $(go.Shape,
+          new go.Binding("stroke", "nature", getLinkColor),
+          new go.Binding("strokeWidth", "impact", getImpactWidth),
+          { strokeDashArray: [4, 2] }),
+        $(go.Shape, { toArrow: "OpenTriangle" },
+          new go.Binding("stroke", "nature", getLinkColor),
+          new go.Binding("fill", "nature", getLinkColor)),
+        $(go.TextBlock, { segmentOffset: new go.Point(0, -10), font: "italic 10px sans-serif" },
+          new go.Binding("text", "type"))
+      );
+
+      diagram.model = new go.TreeModel([
+        { key: 1, label: "CEO" },
+        { key: 2, label: "Manager RH", parent: 1 },
+        { key: 3, label: "Manager Tech", parent: 1 },
+        { key: 4, label: "Dev Front", parent: 3 },
+        { key: 5, label: "Dev Back", parent: 3 }
+      ]);
+    }
+
+    function activateLinkMode() {
+      sourceNode = null;
+      document.getElementById("status").textContent = "Cliquez sur un acteur source...";
+    }
+
+    function handleNodeClick(data) {
+      if (sourceNode === null) {
+        sourceNode = data.key;
+        document.getElementById("status").textContent = "Source : " + data.label + ". Cliquez maintenant sur la cible.";
+      } else if (sourceNode !== data.key) {
+        const cible = data.key;
+        const type = document.getElementById("typeRelation").value || "Mentorat";
+        const nature = document.getElementById("natureRelation").value;
+        const impact = document.getElementById("impactRelation").value;
+
+        diagram.model.addLinkData({
+          from: sourceNode,
+          to: cible,
+          type,
+          nature,
+          impact
+        });
+
+        document.getElementById("status").textContent = "Relation ajoutée entre les deux acteurs.";
+        sourceNode = null;
+      } else {
+        document.getElementById("status").textContent = "Vous devez cliquer sur un acteur différent pour créer une relation.";
+      }
+    }
+
+    function getLinkColor(nature) {
+      switch (nature) {
+        case "Positive": return "green";
+        case "Négative": return "red";
+        case "Neutre": return "gray";
+        default: return "black";
+      }
+    }
+
+    function getImpactWidth(impact) {
+      switch (impact) {
+        case "Faible": return 1;
+        case "Moyen": return 3;
+        case "Fort": return 5;
+        default: return 2;
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
