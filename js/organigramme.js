@@ -1,149 +1,207 @@
 var $ = go.GraphObject.make;
-var myDiagram; // Déclaration globale pour éviter les erreurs
-
+var myDiagram;
 
 fetch('../php/get_user.php')
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            sessionStorage.setItem("userId", data.userId);
-            sessionStorage.setItem("role", data.role);
-            console.log("Utilisateur connecté, ID stocké :", data.userId);
-        } else {
-            console.error("Utilisateur non identifié :", data.message);
-            alert("Vous devez être connecté !");
-            window.location.href = "../html/login.html";
-        }
-    })
-    .catch(error => console.error("Erreur lors de la récupération de l'utilisateur :", error));
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      sessionStorage.setItem("userId", data.userId);
+      sessionStorage.setItem("role", data.role);
+    } else {
+      alert("Vous devez être connecté !");
+      window.location.href = "../html/login.html";
+    }
+  });
 
 function initDiagram(data) {
-    myDiagram = $(go.Diagram, "diagramDiv", { // Assignation à myDiagram
-        layout: $(go.TreeLayout, { 
-            angle: 90, 
-            layerSpacing: 80, // Espacement augmenté entre les niveaux
-            nodeSpacing: 30  // Meilleur alignement des branches
-        }),
-        "undoManager.isEnabled": true
-    });
+  myDiagram = $(go.Diagram, "diagramDiv", {
+    layout: $(go.TreeLayout, {
+      angle: 90,
+      layerSpacing: 80,
+      nodeSpacing: 30
+    }),
+    "undoManager.isEnabled": true,
+    allowZoom: true,
+    allowMove: true
+  });
 
-    //  Définition du modèle de chaque nœud avec design amélioré
-    myDiagram.nodeTemplate =
-        $(go.Node, "Auto",
-            { click: function(e, obj) { showModal(obj.part.data); } }, // Affichage de la modale au clic
-            $(go.Shape, "RoundedRectangle", { 
-                strokeWidth: 2, 
-                stroke: "#388E3C", 
-                fill: $(go.Brush, "Linear", { 0: "#F5F5DC", 1: "#EDEADE" }), // Blanc Cassé
-                width: 250, height: 70, // Taille des nœuds
-                shadowVisible: true
-            }),
-            $(go.Panel, "Table",
-                { margin: 10 },
-                $(go.RowColumnDefinition, { column: 1, width: 100 }),
-                $(go.TextBlock,
-                    { row: 0, column: 0, font: "bold 14px sans-serif", stroke: "black" },
-                    new go.Binding("text", "text")),
-                $(go.TextBlock,
-                    { row: 1, column: 0, font: "italic 12px sans-serif", stroke: "black", margin: new go.Margin(4, 0, 0, 0) },
-                    new go.Binding("text", "role"))
-            )
-        );
+  // ✅ Zoom à la molette (indépendamment du scroll de page)
+  myDiagram.toolManager.mouseWheelBehavior = "zoom";
 
-    // Personnalisation des liens entre les nœuds
-    myDiagram.linkTemplate =
-        $(go.Link,
-            { routing: go.Link.Orthogonal, corner: 10 },
-            $(go.Shape, { stroke: "#388E3C", strokeWidth: 2 }),  // Lignes en vert foncé
-            $(go.Shape, { toArrow: "Standard", fill: "#388E3C", stroke: "#2E7D32" })
-        );
+  // 🎨 Nœud stylisé
+  myDiagram.nodeTemplate =
+    $(go.Node, "Auto",
+      {
+        click: (e, obj) => showModal(obj.part.data),
+        cursor: "pointer"
+      },
+      $(go.Shape, "RoundedRectangle",
+        {
+          strokeWidth: 1,
+          stroke: "#888",
+          fill: "white"
+        },
+        new go.Binding("fill", "sector", getColorBySector)
+      ),
+      $(go.Panel, "Vertical",
+        { margin: 8 },
+        $(go.TextBlock,
+          {
+            font: "bold 14px 'Poppins', sans-serif",
+            stroke: "#333"
+          },
+          new go.Binding("text", "text")),
+        $(go.TextBlock,
+          {
+            font: "12px 'Poppins', sans-serif",
+            stroke: "#555"
+          },
+          new go.Binding("text", "role"))
+      )
+    );
 
-    myDiagram.model = new go.TreeModel(data);
+  myDiagram.linkTemplate =
+    $(go.Link,
+      { routing: go.Link.Orthogonal, corner: 10 },
+      $(go.Shape, { stroke: "#bbb", strokeWidth: 2 }),
+      $(go.Shape, { toArrow: "Standard", fill: "#bbb", stroke: "#999" })
+    );
+
+  myDiagram.model = new go.TreeModel(data);
 }
 
-// Fonction pour afficher la fenêtre modale
+function getColorBySector(sector) {
+  const colors = {
+    informatique: "#82ccdd",
+    vente: "#f8c291",
+    finance: "#f6b93b",
+    rh: "#d1ccc0",
+    marketing: "#f5cd79"
+  };
+  return colors[sector?.toLowerCase()] || "#dcdde1";
+}
+
 function showModal(data) {
-    document.getElementById("modal-title").innerText = data.text;
-    document.getElementById("modal-role").innerText = data.role;
-    document.getElementById("modal-age").innerText = data.age || "Non précisé";
-    document.getElementById("modal-sector").innerText = data.sector || "Non précisé";
+  const modal = document.getElementById("modal");
+  document.getElementById("modal-title").innerText = data.text || "";
+  document.getElementById("modal-role").value = data.role || "";
+  document.getElementById("modal-age").value = data.age || "";
+  document.getElementById("modal-sector").value = data.sector || "";
 
-    document.getElementById("modal").style.display = "block";
+  const customZone = document.getElementById("modal-custom");
+  customZone.innerHTML = "";
+  (data.extraFields || []).forEach(({ label, value }) => {
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <label>${label}</label>
+      <input type="text" data-label="${label}" value="${value}">
+    `;
+    customZone.appendChild(div);
+  });
+
+  document.getElementById("save-btn").onclick = () => {
+    data.role = document.getElementById("modal-role").value;
+    data.age = document.getElementById("modal-age").value;
+    data.sector = document.getElementById("modal-sector").value;
+
+    const extraInputs = modal.querySelectorAll("#modal-custom input");
+    data.extraFields = Array.from(extraInputs).map(input => ({
+      label: input.dataset.label,
+      value: input.value
+    }));
+
+    myDiagram.model.updateTargetBindings(data);
+    closeModal();
+  };
+
+  document.getElementById("add-field-btn").onclick = () => {
+    const label = prompt("Nom du champ :");
+    if (label) {
+      const div = document.createElement("div");
+      div.innerHTML = `
+        <label>${label}</label>
+        <input type="text" data-label="${label}">
+      `;
+      customZone.appendChild(div);
+    }
+  };
+
+  modal.style.display = "block";
+
+  // Fermer au clic extérieur
+  window.onclick = (e) => {
+    if (e.target === modal) closeModal();
+  };
 }
 
-// Fonction pour fermer la fenêtre modale
 function closeModal() {
-    document.getElementById("modal").style.display = "none";
+  document.getElementById("modal").style.display = "none";
 }
-
-// 📡 Chargement des données via Fetch
-fetch('../php/dashboard.php')
-    .then(response => response.json())
-    .then(data => {
-        console.log("Données reçues:", data);
-
-        const formattedData = data.map(person => ({
-            key: String(person.id_acteur),
-            text: person.prenom + " " + person.nom,
-            role: person.role_entreprise || "Non défini",
-            age: person.age || "Non précisé",
-            sector: person.secteur || "Non précisé",
-            parent: person.id_acteur_superieur ? String(person.id_acteur_superieur) : undefined
-        }));
-
-        console.log("Données formatées pour GoJS:", formattedData);
-
-        initDiagram(formattedData);
-    })
-    .catch(error => console.error("Erreur lors du chargement des données:", error));
 
 function saveGraph() {
-    const userId = sessionStorage.getItem("userId");
-    if (!userId) {
-        alert("Utilisateur non connecté !");
-        return;
-    }
+  const userId = sessionStorage.getItem("userId");
+  if (!userId) {
+    alert("Non connecté !");
+    return;
+  }
 
-    const graphData = myDiagram.model.toJson(); // JSON des données du graphe
+  const graphData = myDiagram.model.toJson();
+  const imageData = myDiagram.makeImageData({ scale: 1, background: "white" });
 
-    // 🔥 Génère une image complète du graphe
-    const imageData = myDiagram.makeImageData({ scale: 1, background: "white" }); // base64 PNG
+  fetch(imageData)
+    .then(res => res.blob())
+    .then(blob => {
+      const formData = new FormData();
+      formData.append("image", blob, "graph.png");
+      formData.append("id_utilisateur", userId);
+      formData.append("json", graphData);
 
-    // Convertir base64 en blob
-    fetch(imageData)
-        .then(res => res.blob())
-        .then(blob => {
-            const formData = new FormData();
-            formData.append("image", blob, "graph.png");
-            formData.append("id_utilisateur", userId);
-            formData.append("json", graphData);
-
-            return fetch("../php/save_graph_with_image.php", {
-                method: "POST",
-                body: formData
-            });
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                alert("Organigramme enregistré avec succès !");
-                
-                const role = sessionStorage.getItem("role");
-                if (role === "prof") {
-                    window.location.href = "../html/admin_view.html";
-                }
-                // Sinon, élève : on reste sur la page
-            }
-            
-        })
-        .catch(err => {
-            console.error("Erreur :", err);
-            alert("Erreur d'enregistrement.");
-        });
+      return fetch("../php/save_graph_with_image.php", {
+        method: "POST",
+        body: formData
+      });
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert("Organigramme enregistré !");
+        const role = sessionStorage.getItem("role");
+        if (role === "prof") window.location.href = "../html/admin_view.html";
+      }
+    })
+    .catch(err => {
+      console.error("Erreur :", err);
+      alert("Échec de l'enregistrement.");
+    });
 }
 
-
-
 function graph_informel() {
-    window.location.href = "../html/graph_informel.html";
+  window.location.href = "../html/graph_informel.html";
+}
+
+fetch('../php/dashboard.php')
+  .then(response => response.json())
+  .then(data => {
+    const formatted = data.map(p => ({
+      key: String(p.id_acteur),
+      text: `${p.prenom} ${p.nom}`,
+      role: p.role_entreprise || "Non défini",
+      age: p.age || "Non précisé",
+      sector: p.secteur || "Non précisé",
+      parent: p.id_acteur_superieur ? String(p.id_acteur_superieur) : undefined
+    }));
+    initDiagram(formatted);
+  })
+  .catch(err => console.error("Erreur chargement données:", err));
+
+function zoomIn() {
+if (myDiagram) {
+    myDiagram.commandHandler.increaseZoom();
+}
+}
+
+function zoomOut() {
+if (myDiagram) {
+    myDiagram.commandHandler.decreaseZoom();
+}
 }

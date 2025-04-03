@@ -1,38 +1,88 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Organigramme Stylisé avec GoJS</title>
-
-    <!-- Importation de GoJS -->
-    <script src="https://unpkg.com/gojs/release/go.js"></script>
-
-    <!-- Importation du CSS -->
-    <link rel="stylesheet" href="../css/organigramme.css">
+  <meta charset="UTF-8">
+  <title>Organigramme Personnalisé</title>
+  <script src="https://unpkg.com/gojs/release/go.js"></script>
+  <link rel="stylesheet" href="../css/organigramme.css">
+  <link rel="stylesheet" href="../css/style.css">
 </head>
-<body>
+<body class="org-background">
 
-    <h2 style="text-align:center;"> Organigramme de l'Entreprise</h2>
-    <div id="diagramDiv"></div>
+<!-- HEADER -->
+<div class="header">
+  <div class="sides">
+    <a href="../html/index.html" class="logo">ORFI</a>
+  </div>
+  <div class="sides">
+    <div id="authButtons" class="login-icon"></div>
+  </div>
+  <div class="sides">
+    <a href="#" class="menu" id="openMenu"></a>
+  </div>
+</div>
 
-    <!-- Fenêtre modale pour afficher les informations de l'acteur -->
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2 id="modal-title"></h2>
-            <p><strong>Poste :</strong> <span id="modal-role"></span></p>
-            <p><strong>Âge :</strong> <span id="modal-age"></span></p>
-            <p><strong>Secteur :</strong> <span id="modal-sector"></span></p>
-        </div>
-    </div>
+<!-- MENU DÉROULANT -->
+<dialog id="menuDialog">
+  <a href="../html/index.html">Accueil</a>
+  <a href="../html/dashboard.html">Tableau</a>
+  <a href="../html/organigramme.html">Organigramme</a>
+  <a href="../html/about.html">À propos</a>
+  <a href="../html/course.html">Sociologie des organisations</a>
+  <a href="../html/admin_view.html">Visualisation du graphique des élèves</a>
+</dialog>
 
-    <!-- Importation du script JS -->
-    <script src="../js/librairie/go.js"></script>
-    <script src="../js/organigramme.js"></script>
-    
+<h2 class="org-title">Organigramme de l'entreprise</h2>
 
-    <button id="saveGraph" onclick="saveGraph()">Enregistrer le graphique</button>
-    <button id="graph_informel" onclick="graph_informel()"> Graphique informel</button>
+<div class="org-box">
+  <div id="diagramDiv"></div>
+</div>
+
+<!-- BOUTONS ZOOM -->
+<div class="org-buttons">
+  <button class="btn" onclick="zoomIn()">➕ Zoomer</button>
+  <button class="btn" onclick="zoomOut()">➖ Dézoomer</button>
+</div>
+
+<!-- MODALE -->
+<div id="modal" class="modal popup">
+  <span class="close" onclick="document.getElementById('modal').style.display='none'">✖</span>
+  <h3 id="modal-title"></h3>
+
+  <label for="modal-role">Rôle</label>
+  <input id="modal-role" type="text">
+
+  <label for="modal-age">Âge</label>
+  <input id="modal-age" type="number">
+
+  <label for="modal-sector">Secteur</label>
+  <input id="modal-sector" type="text">
+
+  <div id="modal-custom"></div>
+
+  <button class="btn btn-secondary" id="add-field-btn">➕ Ajouter un champ</button>
+  <button class="btn btn-primary" id="save-btn">💾 Enregistrer</button>
+</div>
+
+<!-- AUTRES BOUTONS -->
+<div class="org-buttons">
+  <button class="btn btn-primary" onclick="saveGraph()">💾 Enregistrer l'organigramme</button>
+  <button class="btn btn-secondary" onclick="graph_informel()">⇄ Organigramme informel</button>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-content">
+    <p>&copy; 2025 ORFI.</p>
+    <nav>
+      <a href="../html/about.html">À propos</a> |
+      <a href="../html/course.html">Organisation Relationnelle</a> |
+      <a href="#">Contact</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="../js/script.js"></script>
+<script src="../js/organigramme.js"></script>
 </body>
 </html>
