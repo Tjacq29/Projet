@@ -1,42 +1,54 @@
-// graph_informel.js – version avancée avec flèches épurées et lisibles
-
 let myDiagram;
-let showInformalLinks = true;
+let selectedTool = null;
+let tempFromNode = null;
+let selectedColor = null;
 
 function init() {
   const $ = go.GraphObject.make;
 
   myDiagram = $(go.Diagram, "myDiagramDiv", {
     "undoManager.isEnabled": true,
+    "toolManager.mouseWheelBehavior": go.ToolManager.WheelZoom,
+    initialAutoScale: go.Diagram.Uniform,
     layout: $(go.TreeLayout, {
       angle: 90,
       layerSpacing: 100,
-      nodeSpacing: 50
+      nodeSpacing: 50,
+      arrangement: go.TreeLayout.ArrangementFixedRoots
     })
   });
 
   myDiagram.nodeTemplate = $(go.Node, "Auto",
+    {
+      selectionAdorned: true,
+      resizable: true,
+      resizeObjectName: "SHAPE",
+      locationSpot: go.Spot.Center,
+      movable: true
+    },
     $(go.Shape, "RoundedRectangle",
       {
-        strokeWidth: 1.5,
+        name: "SHAPE",
         fill: "#b7d8f7",
+        strokeWidth: 1.5,
         portId: "",
         fromLinkable: true,
         toLinkable: true,
         cursor: "pointer"
-      }),
+      },
+      new go.Binding("fill", "fill").makeTwoWay()
+    ),
     $(go.TextBlock,
       {
         margin: 8,
         font: "bold 14px sans-serif",
-        editable: false
+        editable: true
       },
-      new go.Binding("text", "label"))
+      new go.Binding("text", "label").makeTwoWay())
   );
 
   myDiagram.linkTemplate = $(go.Link,
     {
-      layerName: "Foreground",
       relinkableFrom: false,
       relinkableTo: false,
       reshapable: true,
@@ -49,70 +61,154 @@ function init() {
         strokeDashArray: [2, 4],
         strokeCap: "round"
       },
-      new go.Binding("stroke", "nature_relation", getLinkColor),
-      new go.Binding("strokeWidth", "impact_source_vers_cible", impactToWidth),
-      new go.Binding("opacity", "visible", v => v === false ? 0 : 1).makeTwoWay()
-    ),
+      new go.Binding("stroke", "color"),
+      new go.Binding("strokeWidth", "strokeWidth")),
     $(go.Shape,
       {
         toArrow: "OpenTriangle",
         strokeWidth: 1
       },
-      new go.Binding("stroke", "nature_relation", getLinkColor),
-      new go.Binding("fill", "nature_relation", getLinkColor),
-      new go.Binding("opacity", "visible", v => v === false ? 0 : 1).makeTwoWay()
-    ),
-    $(go.TextBlock,
-      { segmentOffset: new go.Point(0, -10), editable: false },
-      new go.Binding("text", "type_relation"))
+      new go.Binding("stroke", "color"),
+      new go.Binding("fill", "color")),
+    $(go.Panel, "Table",
+      $(go.TextBlock,
+        {
+          row: 0,
+          font: "italic 10px sans-serif",
+          editable: true
+        },
+        new go.Binding("text", "affinite").makeTwoWay()
+      ),
+      $(go.TextBlock,
+        {
+          row: 1,
+          font: "italic 10px sans-serif",
+          editable: true
+        },
+        new go.Binding("text", "commentaire").makeTwoWay()
+      )
+    )
   );
 
+  setupButtons();
+  setupColorPanel();
   loadData();
-
-  myDiagram.addDiagramListener("LinkDrawn", (e) => {
-    const link = e.subject;
-    const fromId = parseInt(link.data.from.replace("act_", ""));
-    const toId = parseInt(link.data.to.replace("act_", ""));
-    openRelationForm(fromId, toId, (formData) => {
-      fetch('../php/save_relation_informelle.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          formData.from = "act_" + formData.id_acteur_source;
-          formData.to = "act_" + formData.id_acteur_cible;
-          formData.id_relation_informelle = data.id_relation_informelle;
-          formData.visible = true;
-          myDiagram.model.addLinkData(formData);
-        } else {
-          alert("Erreur: " + data.error);
-        }
-      });
-    });
-  });
-
-  const toggleBtn = document.createElement("button");
-  toggleBtn.innerText = "Masquer relations informelles";
-  toggleBtn.style.margin = "10px";
-  toggleBtn.onclick = toggleInformalLinks;
-  document.body.insertBefore(toggleBtn, document.getElementById("myDiagramDiv"));
 }
 
-function toggleInformalLinks() {
-  showInformalLinks = !showInformalLinks;
+function setupButtons() {
+  document.getElementById("addBlockBtn").onclick = () => {
+    myDiagram.startTransaction("add node");
+    myDiagram.model.addNodeData({
+      key: "node_" + Date.now(),
+      label: "Nouvel Acteur",
+      fill: "#b7d8f7"
+    });
+    myDiagram.commitTransaction("add node");
+  };
 
-  myDiagram.model.linkDataArray.forEach(link => {
-    if (link.id_relation_informelle) {
-      link.visible = showInformalLinks;
+  document.getElementById("linkSimpleBtn").onclick = () => {
+    selectedTool = "simple";
+    tempFromNode = null;
+  };
+
+  document.getElementById("linkDoubleBtn").onclick = () => {
+    selectedTool = "double";
+    tempFromNode = null;
+  };
+
+  document.getElementById("deleteSelectedBtn").onclick = () => {
+    myDiagram.commandHandler.deleteSelection();
+  };
+
+  document.getElementById("strokeWidthRange").oninput = (e) => {
+    const selected = myDiagram.selection.first();
+    if (selected instanceof go.Link) {
+      myDiagram.startTransaction("change width");
+      myDiagram.model.setDataProperty(selected.data, "strokeWidth", parseInt(e.target.value));
+      myDiagram.commitTransaction("change width");
+    }
+  };
+
+  document.getElementById("applyAffinite").onclick = () => {
+    const aff = document.getElementById("affinitySelect").value;
+    const selected = myDiagram.selection.first();
+    if (selected instanceof go.Link) {
+      myDiagram.startTransaction("set affinite");
+      myDiagram.model.setDataProperty(selected.data, "affinite", aff);
+      myDiagram.commitTransaction("set affinite");
+    }
+  };
+
+  document.getElementById("applyComment").onclick = () => {
+    const comment = document.getElementById("commentInput").value;
+    const selected = myDiagram.selection.first();
+    if (selected instanceof go.Link) {
+      myDiagram.startTransaction("set comment");
+      myDiagram.model.setDataProperty(selected.data, "commentaire", comment);
+      myDiagram.commitTransaction("set comment");
+    }
+  };
+
+  myDiagram.addDiagramListener("ObjectSingleClicked", (e) => {
+    const part = e.subject.part;
+    if (!part) return;
+
+    if (selectedColor) {
+      myDiagram.startTransaction("apply color");
+      if (part instanceof go.Node) {
+        myDiagram.model.setDataProperty(part.data, "fill", selectedColor);
+      } else if (part instanceof go.Link) {
+        myDiagram.model.setDataProperty(part.data, "color", selectedColor);
+      }
+      myDiagram.commitTransaction("apply color");
+      selectedColor = null;
+      return;
+    }
+
+    if (!selectedTool || !(part instanceof go.Node)) return;
+
+    if (!tempFromNode) {
+      tempFromNode = part;
+    } else {
+      const from = tempFromNode.data.key;
+      const to = part.data.key;
+
+      const data = {
+        from,
+        to,
+        color: "#333",
+        strokeWidth: 2,
+        affinite: "",
+        commentaire: ""
+      };
+
+      myDiagram.model.addLinkData(data);
+
+      if (selectedTool === "double") {
+        myDiagram.model.addLinkData({ ...data, from: to, to: from });
+      }
+
+      selectedTool = null;
+      tempFromNode = null;
     }
   });
-  myDiagram.model = go.Model.fromJson(myDiagram.model.toJson());
+}
 
-  const btn = document.querySelector("button");
-  btn.innerText = showInformalLinks ? "Masquer relations informelles" : "Afficher relations informelles";
+function setupColorPanel() {
+  const colors = ["#58B19F", "#f8c291", "#82ccdd", "#f6b93b", "#F97F51", "#a29bfe", "#ff7675", "#00b894"];
+  const panel = document.getElementById("colorPanel");
+
+  panel.innerHTML = "";
+  colors.forEach(color => {
+    const btn = document.createElement("button");
+    btn.className = "color-choice";
+    btn.style.backgroundColor = color;
+    btn.title = color;
+    btn.onclick = () => {
+      selectedColor = color;
+    };
+    panel.appendChild(btn);
+  });
 }
 
 function loadData() {
@@ -123,7 +219,8 @@ function loadData() {
     const nodes = acteurs.map(a => ({
       key: "act_" + a.id_acteur,
       label: a.prenom + " " + a.nom,
-      parent: a.id_acteur_superieur ? "act_" + a.id_acteur_superieur : undefined
+      parent: a.id_acteur_superieur ? "act_" + a.id_acteur_superieur : undefined,
+      fill: "#b7d8f7"
     }));
 
     const linksHierarchiques = acteurs
@@ -135,23 +232,26 @@ function loadData() {
 
     myDiagram.model = new go.GraphLinksModel(nodes, linksHierarchiques);
 
-    relationsInformelles.forEach(r => {
-      myDiagram.model.addLinkData({
-        from: "act_" + r.id_acteur_source,
-        to: "act_" + r.id_acteur_cible,
-        type_relation: r.type_relation,
-        nature_relation: r.nature_relation,
-        impact_source_vers_cible: r.impact_source_vers_cible,
-        id_relation_informelle: r.id_relation_informelle,
-        visible: true
+    if (Array.isArray(relationsInformelles)) {
+      relationsInformelles.forEach(r => {
+        myDiagram.model.addLinkData({
+          from: "act_" + r.id_acteur_source,
+          to: "act_" + r.id_acteur_cible,
+          color: getLinkColor(r.nature_relation),
+          strokeWidth: impactToWidth(r.impact_source_vers_cible),
+          type_relation: r.type_relation,
+          nature_relation: r.nature_relation,
+          commentaire: r.commentaire || "",
+          affinite: r.affinite || "",
+          id_relation_informelle: r.id_relation_informelle
+        });
       });
-    });
+    }
   });
 }
 
 function deleteRelation(linkData) {
-  const confirmDelete = confirm("Supprimer cette relation informelle ?");
-  if (!confirmDelete) return;
+  if (!confirm("Supprimer cette relation ?")) return;
 
   fetch('../php/delete_relation_informelle.php', {
     method: 'POST',
@@ -161,52 +261,11 @@ function deleteRelation(linkData) {
   .then(res => res.json())
   .then(result => {
     if (result.success) {
-      alert("Relation supprimée !");
       myDiagram.model.removeLinkData(linkData);
     } else {
       alert("Erreur: " + result.error);
     }
-  })
-  .catch(err => {
-    console.error("Erreur fetch:", err);
-    alert("Erreur réseau lors de la suppression.");
   });
-}
-
-function openRelationForm(sourceId, cibleId, callback) {
-  const form = document.createElement("form");
-  form.innerHTML = `
-    <div style="position:fixed;top:30%;left:30%;background:#fff;padding:20px;border:1px solid #ccc;z-index:1000">
-      <h3>Nouvelle relation</h3>
-      <label>Type: <input name="type_relation" value="Mentorat"></label><br>
-      <label>Direction: <select name="direction_relation">
-        <option>Simple</option><option>Double</option>
-      </select></label><br>
-      <label>Impact source → cible:
-        <select name="impact_source_vers_cible">
-          <option>Faible</option><option>Moyen</option><option>Fort</option>
-        </select></label><br>
-      <label>Impact cible → source:
-        <select name="impact_cible_vers_source">
-          <option>Faible</option><option>Moyen</option><option>Fort</option>
-        </select></label><br>
-      <label>Nature: <select name="nature_relation">
-        <option>Positive</option><option>Négative</option><option>Neutre</option>
-      </select></label><br>
-      <label>Durée (mois): <input type="number" name="duree_relation" value="6"></label><br>
-      <button type="submit">Valider</button>
-    </div>
-  `;
-  document.body.appendChild(form);
-
-  form.onsubmit = (e) => {
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(form));
-    data.id_acteur_source = sourceId;
-    data.id_acteur_cible = cibleId;
-    document.body.removeChild(form);
-    callback(data);
-  };
 }
 
 function getLinkColor(nature) {
@@ -225,12 +284,6 @@ function impactToWidth(impact) {
     case "Fort": return 5;
     default: return 2;
   }
-}
-
-function getDashStyle(type) {
-  if (type.toLowerCase().includes("rivalité")) return [4, 4];
-  if (type.toLowerCase().includes("influence")) return [10, 4];
-  return null;
 }
 
 window.addEventListener("DOMContentLoaded", init);

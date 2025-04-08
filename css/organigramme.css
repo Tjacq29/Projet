@@ -39,8 +39,6 @@ body.org-background {
     height: 100%;
     background-color: #f0f4f8;
     border-radius: 10px;
-  
-    /* ✅ ENLÈVE le scroll */
     overflow: visible;
   }
   
