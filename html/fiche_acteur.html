@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Fiche Acteur</title>
+  <link rel="stylesheet" href="../css/fiche_acteur.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="section">
+    <h2>Sélectionnez un acteur :</h2>
+    <select id="selectActeur">
+      <option value="">-- Choisissez un acteur --</option>
+    </select>
+  </div>
+
+  <div id="ficheContainer" style="display:none">
+    <h1>Fiche de l'acteur : <span id="acteurNom">[Nom]</span></h1>
+
+    <div class="section">
+      <h2>🤩 Carte des Relations : Alliances & Tensions</h2>
+      <canvas id="relationCanvas" width="500" height="500"></canvas>
+    </div>
+
+    <div class="section">
+      <h2>📊 Analyse des Interactions</h2>
+      <canvas id="barChart" width="600" height="300"></canvas>
+    </div>
+
+    <div class="section">
+      <h2>📋 Détails des Relations</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Relation avec</th>
+            <th>Type</th>
+            <th>Nature</th>
+            <th>Impact (→)</th>
+            <th>Impact (←)</th>
+            <th>Durée (mois)</th>
+          </tr>
+        </thead>
+        <tbody id="tableRelations"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="../js/fiche_acteur.js"></script>
+</body>
+</html>
