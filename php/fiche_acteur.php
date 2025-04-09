@@ -4,7 +4,6 @@ header('Content-Type: application/json');
 require_once('../php/config.php');
 session_start();
 
-// Récupération de l'ID acteur depuis l'URL
 $id_acteur = isset($_GET['id_acteur']) ? intval($_GET['id_acteur']) : 0;
 if ($id_acteur === 0) {
   echo json_encode(["error" => "Aucun acteur valide."]);
@@ -18,7 +17,7 @@ if (!isset($_SESSION['id_utilisateur'])) {
 
 $id_utilisateur = $_SESSION['id_utilisateur'];
 
-// Vérification que l'acteur appartient bien à l'utilisateur connecté
+// Vérification que l'acteur appartient à l'utilisateur
 $stmt = $pdo->prepare("SELECT nom, prenom FROM acteur WHERE id_acteur = ? AND id_utilisateur = ?");
 $stmt->execute([$id_acteur, $id_utilisateur]);
 $acteur_info = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -30,66 +29,50 @@ if (!$acteur_info) {
 
 $nom_acteur = $acteur_info['prenom'] . ' ' . $acteur_info['nom'];
 
-// Relations informelles
+// Relations informelles (centrées sur l'acteur sélectionné)
 $stmt = $pdo->prepare("SELECT 
     a2.nom AS nom,
     a2.prenom AS prenom,
-    ri.type_relation,
     ri.nature_relation,
-    ri.impact_source_vers_cible AS impactA,
-    ri.impact_cible_vers_source AS impactB,
-    ri.duree_relation
+    ri.impact_source_vers_cible AS impactA
   FROM relation_informelle ri
   JOIN acteur a2 ON a2.id_acteur = ri.id_acteur_cible
   WHERE ri.id_acteur_source = ?");
 $stmt->execute([$id_acteur]);
 $relations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Relations hiérarchiques
-$stmt = $pdo->prepare("SELECT 
-    a2.nom AS nom,
-    a2.prenom AS prenom,
-    rh.type_relation,
-    'Neutre' AS nature_relation,
-    'Moyen' AS impactA,
-    'Faible' AS impactB,
-    NULL AS duree_relation
-  FROM relation_hierarchique rh
-  JOIN acteur a2 ON a2.id_acteur = rh.id_acteur_superieur
-  WHERE rh.id_acteur_source = ?");
-$stmt->execute([$id_acteur]);
-$hierarchies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Calcul radar : chaque acteur = un axe, valeur = intensité (1 à 3), nature = couleur
+$radar_labels = [];
+$radar_data = [];
+$radar_colors = [];
 
-// Fusion des deux types de relations
-$all_relations = array_merge(
-  array_map(function($r) {
-    $r['nom_cible'] = $r['prenom'] . ' ' . $r['nom'];
-    return $r;
-  }, $relations),
-  array_map(function($r) {
-    $r['nom_superieur'] = $r['prenom'] . ' ' . $r['nom'];
-    return $r;
-  }, $hierarchies)
-);
+foreach ($relations as $rel) {
+  $nom_complet = $rel['prenom'] . ' ' . $rel['nom'];
+  $radar_labels[] = $nom_complet;
 
-// Statistiques pour graphique
-$stats = [
-  "informelles" => count($relations),
-  "hierarchiques" => count($hierarchies),
-  "positives" => count(array_filter($relations, function($r) {
-    return $r['nature_relation'] === "Positive";
-  })),
-  "negatives" => count(array_filter($relations, function($r) {
-    return $r['nature_relation'] === "Négative";
-  })),
-  "fortes" => count(array_filter($relations, function($r) {
-    return $r['impactA'] === "Fort" || $r['impactB'] === "Fort";
-  }))
-];
+  switch ($rel['impactA']) {
+    case "Faible": $val = 1; break;
+    case "Moyen":  $val = 2; break;
+    case "Fort":   $val = 3; break;
+    default:        $val = 0;
+  }
+  $radar_data[] = $val;
 
+  switch ($rel['nature_relation']) {
+    case "Positive": $radar_colors[] = 'rgba(0, 192, 83, 0.6)'; break;
+    case "Négative": $radar_colors[] = 'rgba(254, 6, 60, 0.6)'; break;
+    case "Neutre":   $radar_colors[] = 'rgba(202, 253, 15, 0.6)'; break;
+    default:          $radar_colors[] = 'rgba(150, 150, 150, 0.4)';
+  }
+}
+
+// Retour JSON
 echo json_encode([
   "nom" => $nom_acteur,
-  "relations" => $all_relations,
-  "stats" => $stats
+  "radar" => [
+    "labels" => $radar_labels,
+    "data" => $radar_data,
+    "colors" => $radar_colors
+  ]
 ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 ?>

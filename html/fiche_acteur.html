@@ -5,6 +5,29 @@
   <title>Fiche Acteur</title>
   <link rel="stylesheet" href="../css/fiche_acteur.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .radar-legend {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 14px;
+    }
+    .legend-item {
+      display: inline-block;
+      margin: 0 12px;
+      font-weight: bold;
+    }
+    .legend-dot {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .dot-positive { background-color: #4caf50; }
+    .dot-negative { background-color: #f44336; }
+    .dot-neutral  { background-color: #9e9e9e; }
+  </style>
 </head>
 <body>
   <div class="section">
@@ -18,13 +41,17 @@
     <h1>Fiche de l'acteur : <span id="acteurNom">[Nom]</span></h1>
 
     <div class="section">
-      <h2>🤩 Carte des Relations : Alliances & Tensions</h2>
-      <canvas id="relationCanvas" width="500" height="500"></canvas>
-    </div>
+      <h2>🔄 Radar des Relations Informelles</h2>
+      <canvas id="radarChart" width="600" height="400"></canvas>
 
-    <div class="section">
-      <h2>📊 Analyse des Interactions</h2>
-      <canvas id="barChart" width="600" height="300"></canvas>
+      <!-- ✅ Légende complète -->
+      <div class="radar-legend">
+        <div class="legend-item"><span class="legend-dot dot-positive"></span>Positive</div>
+        <div class="legend-item"><span class="legend-dot dot-negative"></span>Négative</div>
+        <div class="legend-item"><span class="legend-dot dot-neutral"></span>Neutre</div>
+        <br><br>
+        <div><strong>Radar :</strong> Relations informelles exercées par l’acteur sélectionné sur les autres, avec couleur selon la nature et longueur des segments selon intensité (+++ et --- -> longueur de 3...)  .</div>
+      </div>
     </div>
 
     <div class="section">
