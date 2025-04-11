@@ -23,6 +23,11 @@ try {
 
     $relations = [];
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        // Ignore les relations incomplètes (ex : CEO sans supérieur)
+        if (empty($row["id_acteur_superieur"])) {
+            continue;
+        }
+
         $relations[] = [
             "from" => "act_" . $row["id_acteur_source"],
             "to" => "act_" . $row["id_acteur_superieur"],

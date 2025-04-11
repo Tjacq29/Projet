@@ -16,17 +16,31 @@ document.addEventListener("DOMContentLoaded", () => {
       {
         selector: 'node',
         style: {
-          'shape': 'rectangle',
+          'shape': 'round-rectangle', // meilleure forme visuelle qu'un simple rectangle
           'background-color': '#0074D9',
           'label': 'data(label)',
           'color': 'white',
           'text-valign': 'center',
           'text-halign': 'center',
           'padding': '10px',
-          'border-color': '#003e7e',
-          'border-width': 2
+          'border-color': '#003e7',
+          'border-width': 2,
+          'font-size': '13px',
+          'text-wrap': 'wrap',
+          'text-max-width': '160px',
+          'width': '150px',
+          'height': '50px',
+          'border-radius': '12px', // ✅ coins arrondis
+          'shadow-blur': 10,       // ✅ ombre douce
+          'shadow-color': '#333',
+          'shadow-offset-x': 2,
+          'shadow-offset-y': 2,
+          'text-outline-color': '#003e7e',
+          'text-outline-width': 1
         }
-      },
+      }
+      
+      ,
       {
         selector: 'edge',
         style: {
@@ -75,24 +89,37 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Ajouter les relations hiérarchiques
+    console.log("Relations récup :", relations);
+
     relations.forEach(r => {
-      if (r.from && r.to && ids.has(r.from) && ids.has(r.to)) {
-        elements.push({
-          data: {
-            id: `link_${r.from}_${r.to}_${Date.now()}`,
-            source: r.from,
-            target: r.to,
-            label: r.type
-          },
-          classes: 'hierarchie'
-        });
-      } else {
-        console.warn("Relation ignorée (source ou cible absente ou invalide) :", r);
-      }
+      const fromId = r.from;
+      const toId = r.to;
+    
+     
+    
+      elements.push({
+        data: {
+          id: `link_${toId}_${fromId}_${Date.now()}`,
+          source: toId,
+          target: fromId,
+          label: r.type || ""
+        },
+        classes: 'hierarchie'
+      });
     });
+    
+    
 
     cy.add(elements);
-    cy.layout({ name: 'breadthfirst', directed: true, spacingFactor: 1.4 }).run();
+    cy.layout({ 
+      name: 'breadthfirst', 
+      directed: true,
+      spacingFactor: 1.4,
+      roots: cy.nodes().filter(node => cy.edges('[target = "' + node.id() + '"]').length === 0), // noeuds sans supérieur
+      animate: true,
+      orientation: 'vertical' // 'vertical' met le CEO en haut
+    }).run();
+    
   })
   .catch(err => console.error("Erreur de chargement :", err));
 
