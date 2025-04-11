@@ -20,33 +20,40 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $data = json_decode(file_get_contents('php://input'), true);
 
-if (!$data) {
-    echo json_encode(["error" => "Données invalides"]);
+if (!is_array($data)) {
+    echo json_encode(["error" => "Format des données incorrect"]);
     exit();
 }
 
 try {
     $sql = "INSERT INTO relation_informelle (
-                id_acteur_source, id_acteur_cible, type_relation,
-                direction_relation, impact_source_vers_cible,
-                impact_cible_vers_source, nature_relation, duree_relation,
-                id_utilisateur
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        id_acteur_source, id_acteur_cible, type_relation,
+        direction_relation, impact_source_vers_cible,
+        impact_cible_vers_source, nature_relation, duree_relation,
+        id_utilisateur
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([
-        $data["id_acteur_source"],
-        $data["id_acteur_cible"],
-        $data["type_relation"],
-        $data["direction_relation"],
-        $data["impact_source_vers_cible"],
-        $data["impact_cible_vers_source"],
-        $data["nature_relation"],
-        $data["duree_relation"],
-        $id_utilisateur
-    ]);
+    $inserted = 0;
 
-    echo json_encode(["success" => true]);
+    foreach ($data as $relation) {
+        if (!isset($relation['source'], $relation['target'])) continue;
+
+        $stmt->execute([
+            $relation["source"],
+            $relation["target"],
+            $relation["type_relation"],
+            $relation["direction"],
+            $relation["impact_source_vers_cible"],
+            $relation["impact_cible_vers_source"],
+            $relation["nature_relation"],
+            $relation["duree_relation"],
+            $id_utilisateur
+        ]);
+        $inserted++;
+    }
+
+    echo json_encode(["success" => true, "relations_inserted" => $inserted]);
 
 } catch (Exception $e) {
     echo json_encode(["error" => $e->getMessage()]);

@@ -30,8 +30,8 @@ document.addEventListener("DOMContentLoaded", () => {
           'text-max-width': '160px',
           'width': '150px',
           'height': '50px',
-          'border-radius': '12px', // ✅ coins arrondis
-          'shadow-blur': 10,       // ✅ ombre douce
+          'border-radius': '12px',
+          'shadow-blur': 10,       
           'shadow-color': '#333',
           'shadow-offset-x': 2,
           'shadow-offset-y': 2,
@@ -205,6 +205,58 @@ function setupMenu() {
   });
 
   setupColorPanel();
+
+  document.getElementById("saveGraphBtn").onclick = () => {
+    const relationsToSave = [];
+  
+    cy.edges().forEach(edge => {
+      // Ne prendre QUE les relations informelles (pas les hiérarchiques)
+      if (!edge.hasClass("hierarchie")) {
+        const sourceId = edge.source().id().replace("act_", "");
+        const targetId = edge.target().id().replace("act_", "");
+  
+        const isBidirectional = cy.$(`#${targetId}-${sourceId}`).length > 0;
+  
+        relationsToSave.push({
+          source: sourceId,
+          target: targetId,
+          type_relation: edge.data("label") || "Non précisée",
+          direction: isBidirectional ? "Double" : "Simple",
+          impact_source_vers_cible: "Moyen", // Valeurs par défaut (à améliorer si besoin)
+          impact_cible_vers_source: "Moyen",
+          nature_relation: "Neutre",
+          duree_relation: 0
+        });
+      }
+    });
+  
+    if (relationsToSave.length === 0) {
+      alert("Aucune relation informelle à enregistrer.");
+      return;
+    }
+  
+    fetch("../php/save_relation_informelle.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(relationsToSave)
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert(`✅ ${data.relations_inserted} relation(s) informelle(s) enregistrée(s) avec succès.`);
+      } else {
+        alert("❌ Erreur lors de l'enregistrement : " + (data.error || "inconnue"));
+      }
+      console.log("Réponse serveur :", data);
+    })
+    .catch(err => {
+      console.error("Erreur lors de l'enregistrement :", err);
+      alert("❌ Problème de communication avec le serveur.");
+    });
+  };
+  
 }
 
 function setupColorPanel() {

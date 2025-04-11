@@ -9,7 +9,6 @@ fetch('../php/get_saved_graph.php')
     const tbody = document.getElementById("schemaList");
     data.schemas.forEach(schema => {
       const tr = document.createElement("tr");
-
       tr.innerHTML = `
         <td>${schema.prenom}</td>
         <td>${schema.nom_utilisateur}</td>
@@ -30,13 +29,13 @@ fetch('../php/get_saved_graph.php')
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        // pour envoyer les cookies
+        
         body: JSON.stringify({ id_schema: id })
       })
-        .then(res => res.text()) // 👈 transforme en .text() pour voir brut
+        .then(res => res.text()) //  transforme en .text() pour voir brut
         .then(text => {
           console.log("🧾 Réponse brute du serveur :", text);
-          const data = JSON.parse(text); // 👈 on parse manuellement après
+          const data = JSON.parse(text); //  on parse manuellement après
           if (data.success) {
             alert("Schéma supprimé !");
             location.reload();

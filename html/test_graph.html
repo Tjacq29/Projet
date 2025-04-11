@@ -46,10 +46,10 @@
 
 <div class="container">
   <div class="panel">
-    <button id="addNodeBtn">➕ Ajouter un bloc</button>
-    <button id="linkSimpleBtn">🔗 Flèche simple</button>
-    <button id="linkDoubleBtn">🔁 Flèche double sens</button>
-    <button id="deleteSelectedBtn">🗑️ Supprimer sélection</button>
+    
+    <button id="linkSimpleBtn"> Flèche simple</button>
+    <button id="linkDoubleBtn"> Flèche double sens</button>
+    <button id="deleteSelectedBtn">Supprimer sélection</button>
 
     <label>Épaisseur de flèche :</label>
     <input type="range" id="strokeWidthRange" min="1" max="6" value="2">
@@ -61,14 +61,50 @@
       <option>-</option>
       <option>--</option>
     </select>
-    <button id="applyAffinite">🎯 Appliquer</button>
+    <button id="applyAffinite"> Appliquer</button>
 
-    <label>💬 Commentaire :</label>
+    <label> Commentaire :</label>
     <input type="text" id="commentInput" placeholder="..." />
-    <button id="applyComment">📝 Ajouter</button>
+    <button id="applyComment"> Ajouter</button>
 
-    <label>🎨 Couleur :</label>
+    <label> Couleur :</label>
     <div id="colorPanel"></div>
+
+    <hr>
+    <h4> Détails de la relation</h4>
+
+    <label>Direction :</label>
+    <select id="directionSelect">
+      <option value="Simple">Simple</option>
+      <option value="Double">Double</option>
+    </select>
+
+    <label>Impact Source → Cible :</label>
+    <select id="impactSrcCible">
+      <option value="Faible">Faible</option>
+      <option value="Moyen">Moyen</option>
+      <option value="Fort">Fort</option>
+    </select>
+
+    <label>Impact Cible → Source :</label>
+    <select id="impactCibleSrc">
+      <option value="Faible">Faible</option>
+      <option value="Moyen">Moyen</option>
+      <option value="Fort">Fort</option>
+    </select>
+
+    <label>Nature de la relation :</label>
+    <select id="natureRelation">
+      <option value="Positive">Positive</option>
+      <option value="Négative">Négative</option>
+      <option value="Neutre">Neutre</option>
+    </select>
+
+    <label>Durée estimée (mois) :</label>
+    <input type="number" id="dureeRelation" min="1" placeholder="Ex: 6" />
+
+
+    <button id="saveGraphBtn"> Enregistrer le gaphe et les relations</button>
   </div>
 
   <div id="cy"></div>
@@ -78,4 +114,5 @@
 <script src="../js/test_graph.js"></script>
 
 </body>
+
 </html>
