@@ -14,13 +14,12 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => response.text())
         .then(text => {
-            console.log("Réponse brute du serveur :", text); // Vérifie ce que PHP renvoie après le POST
             const data = JSON.parse(text);
             if (data.success) {
-                // Stocker l'utilisateur connecté
+                // Stocker l'utilisateur co
                 sessionStorage.setItem("userId", data.userId);
-                sessionStorage.setItem("prenom", data.prenom); // Pour "Bonjour Prénom"
-                // Redirection vers l'accueil
+                sessionStorage.setItem("prenom", data.prenom); 
+                // Renvoi vers l'accueil
                 window.location.href = "../html/index.html";
             } else {
                 alert(data.message);

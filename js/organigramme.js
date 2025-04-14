@@ -25,10 +25,10 @@ function initDiagram(data) {
     allowMove: true
   });
 
-  // ✅ Zoom à la molette (indépendamment du scroll de page)
+  //  Zoom  molette 
   myDiagram.toolManager.mouseWheelBehavior = "zoom";
 
-  // 🎨 Nœud stylisé
+  //  Nœud stylisé
   myDiagram.nodeTemplate =
     $(go.Node, "Auto",
       {

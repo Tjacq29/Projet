@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 session_start();
 include 'config.php';
 
-// Vérifie que l'utilisateur est connecté
+
 if (!isset($_SESSION['id_utilisateur'])) {
     echo json_encode(["error" => "Utilisateur non connecté"]);
     exit();

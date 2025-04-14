@@ -16,7 +16,7 @@ fetch('../php/get_saved_graph.php')
         <td>${schema.date_time}</td>
         <td><a href="../schemas/img/${schema.nom}.png" download>Télécharger</a></td>
         <td><a href="../schemas/${schema.nom}.json" target="_blank">Voir JSON</a></td>
-        <td><button onclick="deleteSchema(${schema.id_schema})">🗑️</button></td>
+        <td><button onclick="deleteSchema(${schema.id_schema})"> Supprimer </button></td>
       `;
 
       tbody.appendChild(tr);
@@ -44,7 +44,7 @@ fetch('../php/get_saved_graph.php')
           }
         })
         .catch(err => {
-          console.error("❌ Erreur :", err);
+          console.error(" Erreur :", err);
           alert("Erreur réseau ou JSON.");
         });
     }      

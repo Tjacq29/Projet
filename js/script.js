@@ -6,9 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!authContainer) return;
 
     if (userId) {
-        // ✅ Si connecté → afficher prénom + bouton Déconnexion
+        // Si co → afficher prénom + bouton Déconnexion
         authContainer.innerHTML = `
-            <span style="color:white; margin-right:10px;">👋 Bonjour ${prenom}</span>
+            <span style="color:white; margin-right:10px;"> Bjr ${prenom}</span>
             <button id="logoutBtn" style="background:none; border:none; cursor:pointer; color:white; font-size:16px;">
                 Se déconnecter
             </button>
@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = "../php/logout.php";
         });
     } else {
-        // ❌ Si pas connecté → icône Connexion
+        //  Si pas co → icone Connexion
         authContainer.innerHTML = `
             <a href="../html/login.html" id="loginBtn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24" fill="white">

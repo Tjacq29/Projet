@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .then(response => response.text()) // ← pour lire le texte brut
             .then(text => {
-                console.log("Réponse brute du serveur :", text); // 🧪 Affiche ce que PHP renvoie vraiment
+                console.log("Réponse brute du serveur :", text); //  Affiche ce que PHP renvoie vraiment
             
                 // Essaie de parser le JSON seulement si tu vois qu'il est correct
                 const data = JSON.parse(text);
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function loadActeurs() {
     fetch("../php/dashboard.php", {
-        credentials: "include" // 🔒 Important
+        credentials: "include" //  Important
     })
         .then(response => response.json())
         .then(data => {

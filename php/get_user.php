@@ -19,7 +19,7 @@ if ($user) {
         "userId" => $user['id_utilisateur'],
         "prenom" => $user['prenom'],
         "nom" => $user['nom'],
-        "role" => $user['role'] // 👈 IMPORTANT
+        "role" => $user['role'] 
     ]);
 } else {
     echo json_encode(["success" => false, "message" => "Utilisateur introuvable"]);

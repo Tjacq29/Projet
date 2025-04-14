@@ -1,5 +1,3 @@
-// fiche_acteur.js
-
 document.addEventListener("DOMContentLoaded", function () {
     const select = document.getElementById("selectActeur");
     const container = document.getElementById("ficheContainer");
@@ -18,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       });
   
-    // Quand on choisit un acteur
+    // Quand l'util choisit un acteur
     select.addEventListener("change", () => {
       const idActeur = select.value;
       if (!idActeur) return;
@@ -29,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
           container.style.display = "block";
           nomTitre.textContent = acteur.nom;
   
-          // Radar chart
+          // Radar avec les i,fos de l'act
           afficherRadar(acteur.radar);
   
           // Charger les détails relationnels
@@ -46,12 +44,12 @@ document.addEventListener("DOMContentLoaded", function () {
         radarChartInstance.destroy();
       }
     
-      // Dataset principal (la zone de fond complète)
+      
       const mainDataset = {
         label: 'Zone de relations',
         data: radar.data,
-        backgroundColor: 'rgba(100, 100, 100, 0.1)', // léger fond neutre
-        borderColor: 'rgba(120, 120, 120, 0.2)', // bordure grise discrète
+        backgroundColor: 'rgba(100, 100, 100, 0.1)', //  fond neutre
+        borderColor: 'rgba(120, 120, 120, 0.2)', 
         borderWidth: 1,
         pointRadius: 0,
         fill: true

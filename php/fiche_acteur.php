@@ -29,7 +29,7 @@ if (!$acteur_info) {
 
 $nom_acteur = $acteur_info['prenom'] . ' ' . $acteur_info['nom'];
 
-// Relations informelles (centrées sur l'acteur sélectionné)
+// Relations informelles 
 $stmt = $pdo->prepare("SELECT 
     a2.nom AS nom,
     a2.prenom AS prenom,

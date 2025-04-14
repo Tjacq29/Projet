@@ -1,10 +1,10 @@
 <?php
-// Activer l'affichage des erreurs pour faciliter le débogage
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-include 'config.php'; // Inclure la configuration de la base de données
+include 'config.php'; 
 
 if (!isset($_GET["id_acteur"])) {
     echo json_encode(["error" => "ID acteur manquant"]);
@@ -14,7 +14,7 @@ if (!isset($_GET["id_acteur"])) {
 $id_acteur = $_GET["id_acteur"]; // Récupérer l'ID de l'acteur
 
 try {
-    // 🔎 Requête SQL pour récupérer les informations de l'acteur, ainsi que l'ID de son supérieur
+    //  Requête SQL pour récupérer les informations de l'acteur, ainsi que l'ID de son supérieur
     $sql = "SELECT a.*, r.id_acteur_superieur 
             FROM acteur a
             LEFT JOIN relation_hierarchique r ON a.id_acteur = r.id_acteur_source
@@ -30,7 +30,7 @@ try {
         exit();
     }
 
-    // 🔹 Si l'acteur n'a pas de supérieur, renvoyer une chaîne vide
+    // Si l'acteur n'a pas de supérieur, renvoyer une chaîne vide
     $acteur["id_acteur_superieur"] = isset($acteur["id_acteur_superieur"]) ? $acteur["id_acteur_superieur"] : "";
 
     // Retourner l'acteur au format JSON
@@ -38,7 +38,6 @@ try {
     echo json_encode($acteur, JSON_PRETTY_PRINT);
 
 } catch (Exception $e) {
-    // En cas d'erreur SQL, renvoyer l'erreur
     echo json_encode(["error" => "Erreur SQL : " . $e->getMessage()]);
 }
 ?>

@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <title>Graphique Informel (Cytoscape)</title>
 
-  <!-- ✅ Cytoscape.js depuis CDN -->
+  <!--  Cytoscape.js depuis CDN -->
   <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.26.0/dist/cytoscape.min.js"></script>
 
   <style>
@@ -46,15 +47,14 @@
 
 <div class="container">
   <div class="panel">
-    
-    <button id="linkSimpleBtn"> Flèche simple</button>
-    <button id="linkDoubleBtn"> Flèche double sens</button>
-    <button id="deleteSelectedBtn">Supprimer sélection</button>
+    <button id="linkSimpleBtn">-> Flèche simple</button>
+    <button id="linkDoubleBtn">🔁 Flèche double sens</button>
+    <button id="deleteSelectedBtn">🗑️ Supprimer sélection</button>
 
     <label>Épaisseur de flèche :</label>
     <input type="range" id="strokeWidthRange" min="1" max="6" value="2">
 
-    <label>🌀 Affinité :</label>
+    <label> Affinité :</label>
     <select id="affinitySelect">
       <option>++</option>
       <option>+</option>
@@ -71,48 +71,15 @@
     <div id="colorPanel"></div>
 
     <hr>
-    <h4> Détails de la relation</h4>
-
-    <label>Direction :</label>
-    <select id="directionSelect">
-      <option value="Simple">Simple</option>
-      <option value="Double">Double</option>
-    </select>
-
-    <label>Impact Source → Cible :</label>
-    <select id="impactSrcCible">
-      <option value="Faible">Faible</option>
-      <option value="Moyen">Moyen</option>
-      <option value="Fort">Fort</option>
-    </select>
-
-    <label>Impact Cible → Source :</label>
-    <select id="impactCibleSrc">
-      <option value="Faible">Faible</option>
-      <option value="Moyen">Moyen</option>
-      <option value="Fort">Fort</option>
-    </select>
-
-    <label>Nature de la relation :</label>
-    <select id="natureRelation">
-      <option value="Positive">Positive</option>
-      <option value="Négative">Négative</option>
-      <option value="Neutre">Neutre</option>
-    </select>
-
-    <label>Durée estimée (mois) :</label>
-    <input type="number" id="dureeRelation" min="1" placeholder="Ex: 6" />
-
-
-    <button id="saveGraphBtn"> Enregistrer le gaphe et les relations</button>
+    <h4> Enregistrement</h4>
+    <button id="saveGraphBtn"> Enregistrer le graphe et les relations</button>
   </div>
 
   <div id="cy"></div>
 </div>
 
-<!-- ✅ Ton script Cytoscape perso -->
+<!-- script Cytoscape avec popup intégré -->
 <script src="../js/test_graph.js"></script>
 
 </body>
-
 </html>

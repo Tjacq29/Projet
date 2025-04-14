@@ -12,7 +12,7 @@ if ($id_acteur === 0 || !isset($_SESSION['id_utilisateur'])) {
 
 $id_utilisateur = $_SESSION['id_utilisateur'];
 
-// Vérification que l'acteur appartient bien à l'utilisateur connecté
+// Vérification que l'acteur appartient bien à l'utilisateur co
 $stmt = $pdo->prepare("SELECT id_acteur FROM acteur WHERE id_acteur = ? AND id_utilisateur = ?");
 $stmt->execute([$id_acteur, $id_utilisateur]);
 if (!$stmt->fetch()) {

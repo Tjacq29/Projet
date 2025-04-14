@@ -10,7 +10,7 @@ if (!isset($_SESSION["id_utilisateur"])) {
 
 $id_utilisateur = $_SESSION["id_utilisateur"];
 
-// Remplacer l'opérateur ?? par isset pour compatibilité avec les anciennes versions PHP
+
 $id_acteur = isset($_POST["id_acteur"]) ? $_POST["id_acteur"] : null;
 $nom = isset($_POST["nom"]) ? $_POST["nom"] : null;
 $prenom = isset($_POST["prenom"]) ? $_POST["prenom"] : null;

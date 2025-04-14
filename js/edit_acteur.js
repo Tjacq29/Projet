@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch(`../php/get_acteur.php?id_acteur=${idActeur}`)
             .then(response => response.text()) // Changer en text() pour voir tout le texte brut
             .then(text => {
-                console.log("Réponse brute du serveur :", text); // 🧪 Affiche ce que PHP renvoie vraiment
                 try {
                     const data = JSON.parse(text);
                     if (data.error) {
