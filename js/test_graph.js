@@ -3,55 +3,64 @@ let cy;
 let selectedTool = null;
 let tempFromNode = null;
 let selectedColor = null;
+let deletedRelationIds = [];
 
-// Formulaire contextuel HTML injecté dynamiquement
-const popupFormHTML = `
-  <div id="relationForm" style="
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    border: 2px solid #0074D9;
-    box-shadow: 0 0 15px rgba(0,0,0,0.3);
-    z-index: 9999;
-  ">
-    <h4>Détails de la relation</h4>
-    <label>Type :</label>
-    <input type="text" id="popupType" placeholder="ex: Influence, Amitié..." style="width:100%"><br><br>
-    
-    <label>Impact Source → Cible :</label>
-    <select id="popupImpactSrcCible" style="width:100%">
-      <option value="Faible">Faible</option>
-      <option value="Moyen" selected>Moyen</option>
-      <option value="Fort">Fort</option>
-    </select><br><br>
 
-    <label>Impact Cible → Source :</label>
-    <select id="popupImpactCibleSrc" style="width:100%">
-      <option value="Faible">Faible</option>
-      <option value="Moyen" selected>Moyen</option>
-      <option value="Fort">Fort</option>
-    </select><br><br>
 
-    <label>Nature :</label>
-    <select id="popupNature" style="width:100%">
-      <option value="Positive">Positive</option>
-      <option value="Négative">Négative</option>
-      <option value="Neutre" selected>Neutre</option>
-    </select><br><br>
-
-    <label>Durée (mois) :</label>
-    <input type="number" id="popupDuree" min="0" value="0" style="width:100%"><br><br>
-
-    <button onclick="submitRelationDetails()">✅ Valider</button>
-    <button onclick="cancelRelation()">❌ Annuler</button>
-  </div>
-`;
 
 let tempEdgeData = null;
 let lastFrom = null;
 let lastTo = null;
+
+function getPopupFormHTML(direction) {
+  const isDouble = direction === "Double";
+
+  return `
+    <div id="relationForm" style="
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border: 2px solid #0074D9;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      z-index: 9999;
+    ">
+      <h4>Détails de la relation</h4>
+      <label>Type :</label>
+      <input type="text" id="popupType" placeholder="ex: Influence, Amitié..." style="width:100%"><br><br>
+
+      <label>Impact Source → Cible :</label>
+      <select id="popupImpactSrcCible" style="width:100%">
+        <option value="Faible">Faible</option>
+        <option value="Moyen" selected>Moyen</option>
+        <option value="Fort">Fort</option>
+      </select><br><br>
+
+      ${isDouble ? `
+      <label>Impact Cible → Source :</label>
+      <select id="popupImpactCibleSrc" style="width:100%">
+        <option value="Faible">Faible</option>
+        <option value="Moyen" selected>Moyen</option>
+        <option value="Fort">Fort</option>
+      </select><br><br>` : ''}
+
+      <label>Nature :</label>
+      <select id="popupNature" style="width:100%">
+        <option value="Positive">Positive</option>
+        <option value="Négative">Négative</option>
+        <option value="Neutre" selected>Neutre</option>
+      </select><br><br>
+
+      <label>Durée (mois) :</label>
+      <input type="number" id="popupDuree" min="0" value="0" style="width:100%"><br><br>
+
+      <button onclick="submitRelationDetails()">Valider</button>
+      <button onclick="cancelRelation()">Annuler</button>
+    </div>
+  `;
+}
+
 
 function createRelationPopup(fromId, toId, direction) {
   if (document.getElementById("relationForm")) return;
@@ -66,7 +75,7 @@ function createRelationPopup(fromId, toId, direction) {
     direction
   };
 
-  document.body.insertAdjacentHTML("beforeend", popupFormHTML);
+  document.body.insertAdjacentHTML("beforeend", getPopupFormHTML(direction));
 }
 
 function cancelRelation() {
@@ -96,7 +105,10 @@ function getLineStyleByImpact(impact) {
 function submitRelationDetails() {
   const label = document.getElementById("popupType").value || "Relation";
   const impactSrcCible = document.getElementById("popupImpactSrcCible").value;
-  const impactCibleSrc = document.getElementById("popupImpactCibleSrc").value;
+  const impactCibleSrc = document.getElementById("popupImpactCibleSrc")
+  ? document.getElementById("popupImpactCibleSrc").value
+  : null;
+
   const nature = document.getElementById("popupNature").value;
   const duree = parseInt(document.getElementById("popupDuree").value) || 0;
 
@@ -206,15 +218,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   Promise.all([
     fetch('../php/dashboard.php').then(res => res.json()),
-    fetch('../php/get_relations_hierarchiques.php').then(res => res.json())
+    fetch('../php/get_relations_hierarchiques.php').then(res => res.json()),
+    fetch('../php/get_relations_informelles.php').then(res => res.json())
   ])
-  .then(([acteurs, relations]) => {
+  .then(([acteurs, relationsHierarchiques, relationsInformelles]) => {
     const elements = [];
-    const ids = new Set();
-
+  
+    // Acteurs (noeuds)
     acteurs.forEach(a => {
       const nodeId = 'act_' + a.id_acteur;
-      ids.add(nodeId);
       elements.push({
         data: {
           id: nodeId,
@@ -222,22 +234,81 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     });
-
-    relations.forEach(r => {
-      const fromId = r.from;
-      const toId = r.to;
+  
+    // Relations hiérarchiques
+    relationsHierarchiques.forEach(r => {
       elements.push({
         data: {
-          id: `link_${toId}_${fromId}_${Date.now()}`,
-          source: toId,
-          target: fromId,
+          id: `link_${r.to}_${r.from}_${Date.now()}`,
+          source: r.to,
+          target: r.from,
           label: r.type || ""
         },
         classes: 'hierarchie'
       });
     });
-
+  
+    // Relations informelles
+    if (!Array.isArray(relationsInformelles)) {
+      console.error("❌ relationsInformelles n’est pas un tableau :", relationsInformelles);
+    } else {
+      relationsInformelles.forEach(rel => {
+        const color = getColorByNature(rel.nature_relation);
+        const styleSrc = getLineStyleByImpact(rel.impact_source_vers_cible);
+        const styleCible = getLineStyleByImpact(rel.impact_cible_vers_source);
+  
+        // Flèche source → cible
+        elements.push({
+          data: {
+            id: "rel_" + rel.uid,
+            uid: rel.uid,
+            source: rel.from,
+            target: rel.to,
+            label: rel.type_relation,
+            direction: rel.direction,
+            impact_source_vers_cible: rel.impact_source_vers_cible,
+            impact_cible_vers_source: rel.impact_cible_vers_source,
+            nature_relation: rel.nature_relation,
+            duree_relation: rel.duree_relation
+          },
+          style: {
+            'line-color': color,
+            'target-arrow-color': color,
+            'width': styleSrc.width,
+            'line-style': styleSrc.style
+          }
+        });
+  
+        // Flèche retour si double
+        if (rel.direction === "Double") {
+          elements.push({
+            data: {
+              id: "rel_" + rel.uid + "_reverse",
+              uid: rel.uid,
+              source: rel.to,
+              target: rel.from,
+              label: rel.type_relation,
+              direction: rel.direction,
+              impact_source_vers_cible: rel.impact_cible_vers_source,
+              impact_cible_vers_source: rel.impact_source_vers_cible,
+              nature_relation: rel.nature_relation,
+              duree_relation: rel.duree_relation
+            },
+            style: {
+              'line-color': color,
+              'target-arrow-color': color,
+              'width': styleCible.width,
+              'line-style': styleCible.style
+            }
+          });
+        }
+      });
+    }
+  
+    // ➕ Ajout de tous les éléments d'un coup
     cy.add(elements);
+  
+    // 🔃 Layout
     cy.layout({
       name: 'breadthfirst',
       directed: true,
@@ -248,6 +319,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }).run();
   })
   .catch(err => console.error("Erreur de chargement :", err));
+  
 
   setupMenu();
 });
@@ -264,8 +336,25 @@ function setupMenu() {
   };
 
   document.getElementById("deleteSelectedBtn").onclick = () => {
-    cy.$(':selected').remove();
+    if (confirm("Voulez-vous vraiment supprimer cette relation ?")) {
+      const selected = cy.$(':selected');
+      selected.forEach(el => {
+        if (el.isEdge() && !el.hasClass("hierarchie")) {
+          const uid = el.data("uid");
+          if (uid) {
+            deletedRelationIds.push(uid);
+          }
+          
+
+        }
+      });
+      selected.remove();
+    }
   };
+
+  
+  
+  
 
   cy.on('tap', 'node', (e) => {
     const node = e.target;
@@ -309,31 +398,42 @@ function setupMenu() {
         });
       }
     });
-
+  
     fetch("../php/save_relation_informelle.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(relationsToSave)
+      body: JSON.stringify({
+        relations: relationsToSave,
+        toDelete: deletedRelationIds
+      })
     })
-    .then(res => res.json())
-    .then(data => {
-      alert(data.success
-        ? ` ${data.relations_inserted} relation(s) enregistrée(s).`
-        : ` Erreur : ${data.error || 'inconnue'}`);
-    })
+    .then(res => res.text()) // récupère en texte brut
+    .then(text => {
+      console.log("Réponse brute du serveur :", text); // 🔍 tu verras l'erreur ici
+
+      const response = JSON.parse(text); // tu le parses à la main
+      alert(response.success
+        ? ` ${response.relations_inserted} relation(s) enregistrée(s).`
+        : ` Erreur : ${response.error || 'inconnue'}`);
+
+  deletedRelationIds = [];
+})
+
+    
     .catch(err => {
       console.error("Erreur serveur :", err);
       alert(" Problème de communication avec le serveur.");
     });
   };
+  
 
   setupColorPanel();
 }
 
 function setupColorPanel() {
-  const colors = ["#58B19F", "#f8c291", "#82ccdd", "#f6b93b", "#F97F51", "#a29bfe", "#ff7675", "#00b894"];
+  const colors = ["#58B19F", "#f8c291", "#82ccdd", "#f6b93b", "#F97F51", "#a29bfe", "#ff7675"];
   const panel = document.getElementById("colorPanel");
   colors.forEach(color => {
     const btn = document.createElement("button");

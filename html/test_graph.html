@@ -1,84 +1,161 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <title>Graphique Informel (Cytoscape)</title>
-
-  <!--  Cytoscape.js depuis CDN -->
   <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.26.0/dist/cytoscape.min.js"></script>
-
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 0;
     }
-    #cy {
-      flex: 1;
-      height: 600px;
-    }
-    .panel {
-      width: 250px;
-      padding: 10px;
-      background: #f9f9f9;
-      border-right: 1px solid #ccc;
-    }
+
     .container {
       display: flex;
       height: 100vh;
     }
-    .panel button, .panel select, .panel input {
-      width: 100%;
-      margin-top: 6px;
+
+    .panel {
+      width: 260px;
+      padding: 20px;
+      background: #f4f6f9;
+      border-right: 1px solid #ccc;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
     }
-    .color-choice {
-      width: 20px;
-      height: 20px;
+
+    .panel h4 {
+      margin-top: 20px;
+      font-size: 15px;
+      color: #333;
+    }
+
+    .panel label {
+      margin-top: 10px;
+      font-weight: bold;
+      display: block;
+      font-size: 13px;
+      color: #333;
+    }
+
+    .panel button {
+      padding: 8px 10px;
       border: none;
-      margin: 2px;
-      display: inline-block;
+      background-color: #0074D9;
+      color: white;
+      border-radius: 4px;
       cursor: pointer;
+      font-size: 14px;
+      margin-top: 6px;
+      transition: background-color 0.2s;
+    }
+
+    .panel button:hover {
+      background-color: #005fa3;
+    }
+
+    .panel input,
+    .panel select {
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .color-choice {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid #ddd;
+      margin: 3px;
+      cursor: pointer;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #cy {
+      flex: 1;
+      height: 100%;
+      min-height: 600px;
+      background: #ffffff;
+    }
+
+    .legend {
+      padding: 20px;
+      background: #f4f6f9;
+      border-top: 1px solid #ccc;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .legend div {
+      margin-bottom: 4px;
     }
   </style>
 </head>
 
 <body>
-
+  <header style="background-color: #0074D9; padding: 15px; color: white; text-align: center;">
+    <h1 style="margin: 0; font-size: 22px;">Création du Graphe Informel</h1>
+    <p style="margin: 5px 0 0; font-size: 14px;">Visualisez et saisissez les relations informelles entre les acteurs</p>
+  </header>
+  
 <div class="container">
   <div class="panel">
-    <button id="linkSimpleBtn">-> Flèche simple</button>
-    <button id="linkDoubleBtn">🔁 Flèche double sens</button>
-    <button id="deleteSelectedBtn">🗑️ Supprimer sélection</button>
+    <button id="linkSimpleBtn">→ Flèche simple</button>
+    <button id="linkDoubleBtn">↔ Flèche double sens</button>
+    <button id="deleteSelectedBtn">Supprimer sélection</button>
 
-    <label>Épaisseur de flèche :</label>
-    <input type="range" id="strokeWidthRange" min="1" max="6" value="2">
-
-    <label> Affinité :</label>
-    <select id="affinitySelect">
-      <option>++</option>
-      <option>+</option>
-      <option>-</option>
-      <option>--</option>
-    </select>
-    <button id="applyAffinite"> Appliquer</button>
-
-    <label> Commentaire :</label>
-    <input type="text" id="commentInput" placeholder="..." />
-    <button id="applyComment"> Ajouter</button>
-
-    <label> Couleur :</label>
+    <label>Couleur :</label>
     <div id="colorPanel"></div>
 
     <hr>
-    <h4> Enregistrement</h4>
-    <button id="saveGraphBtn"> Enregistrer le graphe et les relations</button>
+    <h4>Enregistrement</h4>
+    <button id="saveGraphBtn">Enregistrer le graphe et les relations</button>
+
+    <hr>
+    <h4>Mode d’emploi</h4>
+    <div style="font-size: 13px; line-height: 1.4;">
+      - Cliquez sur → Flèche simple ou ↔ Flèche double<br>
+      - Sélectionnez 2 acteurs dans le graphe<br>
+      - Complétez les informations dans le formulaire<br>
+      - Cliquez sur “Enregistrer le graphe”
+    </div>
   </div>
 
-  <div id="cy"></div>
+  <div class="main">
+    <div id="cy"></div>
+
+    <div class="legend">
+      <h4 style="margin-bottom: 10px;">Légende</h4>
+    
+      <div style="display: flex; justify-content: space-between; gap: 40px; flex-wrap: wrap;">
+        
+        <div style="flex: 1; min-width: 120px;">
+          <strong>Nature :</strong><br>
+          <div><span style="display:inline-block;width:18px;height:4px;background:#2ecc71;margin-right:5px;"></span> Positive</div>
+          <div><span style="display:inline-block;width:18px;height:4px;background:#e74c3c;margin-right:5px;"></span> Négative</div>
+          <div><span style="display:inline-block;width:18px;height:4px;background:#95a5a6;margin-right:5px;"></span> Neutre</div>
+        </div>
+    
+        <div style="flex: 1; min-width: 120px;">
+          <strong>Impact :</strong><br>
+          <div><span style="display:inline-block;width:18px;height:2px;border-top:1px dotted black;margin-right:5px;"></span> Faible</div>
+          <div><span style="display:inline-block;width:18px;height:4px;border-top:2px solid black;margin-right:5px;"></span> Moyen</div>
+          <div><span style="display:inline-block;width:18px;height:6px;border-top:3px solid black;margin-right:5px;"></span> Fort</div>
+        </div>
+    
+      </div>
+    </div>
+    
+  </div>
 </div>
 
-<!-- script Cytoscape avec popup intégré -->
 <script src="../js/test_graph.js"></script>
 
 </body>
