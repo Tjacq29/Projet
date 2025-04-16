@@ -190,7 +190,7 @@ function dataURLToBlob(dataURL) {
 }
 
 function graph_informel() {
-  window.location.href = "../html/graph_informel.html";
+  window.location.href = "../html/test_graph.html";
 }
 
 fetch('../php/dashboard.php')
