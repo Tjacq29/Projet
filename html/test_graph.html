@@ -111,8 +111,20 @@
     <button id="linkDoubleBtn">↔ Flèche double sens</button>
     <button id="deleteSelectedBtn">Supprimer sélection</button>
 
-    <label>Couleur :</label>
+    <label>Couleur des acteurs selon leurs secteurs:</label>
     <div id="colorPanel"></div>
+
+    <hr>
+    <h4>Zones d'ambiance</h4>
+    <div style="display:flex;gap: 10px;margin-top: 8px;">
+      <button onclick="creerZoneContour('alliance')">Créer Zone Alliance +++</button>
+    <button onclick="creerZoneContour('tension')">Créer Zone Tension ---</button>
+    </div>
+    
+    <button onclick="supprimerZoneContour()">🗑️ Supprimer une zone sélectionnée</button>
+
+   
+
 
     <hr>
     <h4>Enregistrement / Envoi du graphique</h4>
@@ -120,19 +132,36 @@
       <button id="saveGraphBtn" style="flex: 1;">Enregistrer</button>
       <button id="submitToProfBtn" style="flex: 1; background-color: #28a745;">Envoyer au Prof</button>
     </div>
-    
+    <hr>
+    <h4>Fiche acteur</h4>
+    <button class="btn" onclick="window.location.href='../html/fiche_acteur.html'" style="margin-top: 10px; background-color: #6c757d;">Fiche récapitulative des relations informelles par acteur </button>
    
     <hr>
-    <h4>Mode d’emploi</h4>
-    <div style="font-size: 13px; line-height: 1.4;">
+    <h4 style="cursor: pointer;" onclick="toggleInstructions()">📘 Mode d’emploi ▼</h4>
+    <div id="instructions" style="font-size: 13px; line-height: 1.4;">
+      <strong>- Pour créer une relation :</strong><br>
       - Cliquez sur → Flèche simple ou ↔ Flèche double<br>
       - Sélectionnez 2 acteurs dans le graphe<br>
       - Complétez les informations dans le formulaire<br>
-      - Cliquez sur “Enregistrer le graphe et les relations" une fois votre gaphique terminé<br><br>
-      - N'hésitez pas à déplacer les acteurs sur le graphiques car certaines relations peuvent se marcher dessus<br><br>
-      - Une fois le graphe enregistré, vous pouvez en cliquant sur le bouton fiche acteur ci-dessous, vous rendre sur une page pour voir en détails les relations informelles de chaque acteur sous forme de radar/tableau
-      <button class="btn" onclick="window.location.href='../html/fiche_acteur.html'" style="margin-top: 10px; background-color: #6c757d;">Fiche récapitulative des relations informelles par acteur </button>
+      
 
+      <strong>- Pour créer une zone (alliance/tension) :</strong><br>
+      &nbsp;&nbsp;&nbsp;- Cliquez sur un acteur<br>
+      &nbsp;&nbsp;&nbsp;- Maintenez la touche Ctrl (ou Cmd sur Mac)<br>
+      &nbsp;&nbsp;&nbsp;- Cliquez sur les autres acteurs à inclure<br>
+      - Cliquez sur “Créer Zone Alliance +++” ou “Créer Zone Tension ---” pour encadrer les acteurs sélectionnés<br><br>
+
+      <strong>- Pour supprimer une zone :</strong><br>
+      &nbsp;&nbsp;&nbsp;- Cliquez sur le cadre de la zone<br>
+      &nbsp;&nbsp;&nbsp;- Puis cliquez sur “Supprimer une zone sélectionnée”<br><br>
+
+      <strong> Pour plus de visibilité </strong><br>
+      - N'hésitez pas à déplacer les acteurs sur le graphiques car certaines relations peuvent se marcher dessus<br><br>
+      <strong> Graphique terminé ?</strong><br>
+      - Cliquer sur Enregistrer pour sauvegarder votre graphique et les relations créées<br>
+      - Cliquer sur envoyer au prof pour rendre votre travail<br>
+      - Une fois le graphe enregistré, vous pouvez en cliquant sur le bouton fiche acteur, vous rendre sur une page pour voir en détails les relations informelles de chaque acteur sous forme de radar/tableau
+      
     </div>
 
     
@@ -146,7 +175,7 @@
     
       <div style="display: flex; justify-content: space-between; gap: 30px; flex-wrap: wrap;">
         
-        <div style="flex: 1; min-width: 120px;">
+        <div style="flex: 1; min-width: 60px;">
           <strong>Nature :</strong><br>
           <div><span style="display:inline-block;width:18px;height:4px;background:#2ecc71;margin-right:5px;"></span> Positive</div>
           <div><span style="display:inline-block;width:18px;height:4px;background:#e74c3c;margin-right:5px;"></span> Négative</div>
@@ -167,6 +196,16 @@
 </div>
 
 <script src="../js/test_graph.js"></script>
+<script>
+  function toggleInstructions() {
+    const el = document.getElementById("instructions");
+    const isVisible = el.style.display !== "none";
+    el.style.display = isVisible ? "none" : "block";
+
+    const title = document.querySelector("h4[onclick='toggleInstructions()']");
+    title.innerHTML = isVisible ? "📘 Mode d’emploi ▶" : "📘 Mode d’emploi ▼";
+  }
+</script>
 
 </body>
 </html>
