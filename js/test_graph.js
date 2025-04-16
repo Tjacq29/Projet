@@ -468,3 +468,37 @@ function setupColorPanel() {
     panel.appendChild(btn);
   });
 }
+
+document.getElementById("submitToProfBtn").onclick = () => {
+  const userId = sessionStorage.getItem("userId");
+  if (!userId) {
+    alert("Vous devez être connecté.");
+    return;
+  }
+
+  const imageData = cy.png({ scale: 2, output: 'blob' }); // export Cytoscape en image
+  const formData = new FormData();
+  formData.append("image", imageData, "graph_informel.png");
+  formData.append("id_utilisateur", userId);
+  formData.append("type_schema", "informelle");
+  formData.append("nom", "graphe_informel_" + Date.now());
+
+  fetch("../php/save_graph_with_image.php", {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert("Graphe informel envoyé au professeur !");
+      const role = sessionStorage.getItem("role");
+      if (role === "prof") window.location.href = "../html/admin_view.html";
+    } else {
+      alert("Erreur : " + data.message);
+    }
+  })
+  .catch(err => {
+    console.error("Erreur :", err);
+    alert("Erreur lors de l’envoi du graphe.");
+  });
+};
