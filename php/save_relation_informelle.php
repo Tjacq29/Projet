@@ -25,7 +25,7 @@ try {
     $inserted = 0;
     $deleted = 0;
 
-    // Supprimer les relations par ID
+    // Suppression des relations
     if (!empty($toDelete)) {
         $stmtDelete = $pdo->prepare("DELETE FROM relation_informelle WHERE id_relation_informelle = ? AND id_utilisateur = ?");
         foreach ($toDelete as $uid) {
@@ -34,43 +34,47 @@ try {
         }
     }
 
-    // Insérer de nouvelles relations (évite les doublons)
-    if (!empty($relations)) {
-        $stmtInsert = $pdo->prepare("
-            INSERT INTO relation_informelle (
-                id_acteur_source, id_acteur_cible, type_relation,
-                direction_relation, impact_source_vers_cible,
-                impact_cible_vers_source, nature_relation, duree_relation,
-                id_utilisateur
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ");
+    // Préparation requêtes
+    $stmtInsert = $pdo->prepare("
+        INSERT INTO relation_informelle (
+            id_acteur_source, id_acteur_cible, type_relation,
+            direction_relation, impact_source_vers_cible,
+            impact_cible_vers_source, nature_relation, duree_relation,
+            id_utilisateur
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ");
 
-        $stmtCheck = $pdo->prepare("
-            SELECT COUNT(*) FROM relation_informelle 
-            WHERE id_utilisateur = ? AND 
-            id_acteur_source = ? AND id_acteur_cible = ?
-        ");
+    $stmtCheck = $pdo->prepare("
+        SELECT COUNT(*) FROM relation_informelle 
+        WHERE id_utilisateur = ? AND (
+            (id_acteur_source = ? AND id_acteur_cible = ?)
+            OR (id_acteur_source = ? AND id_acteur_cible = ?)
+        )
+    ");
 
-        foreach ($relations as $rel) {
-            if (!isset($rel['source'], $rel['target'])) continue;
+    foreach ($relations as $rel) {
+        if (!isset($rel['source'], $rel['target'])) continue;
 
-            // Vérifie si elle existe déjà
-            $stmtCheck->execute([$id_utilisateur, $rel["source"], $rel["target"]]);
-            if ($stmtCheck->fetchColumn() > 0) continue;
+        // Évite les doublons dans les deux sens
+        $stmtCheck->execute([
+            $id_utilisateur,
+            $rel["source"], $rel["target"],
+            $rel["target"], $rel["source"]
+        ]);
+        if ($stmtCheck->fetchColumn() > 0) continue;
 
-            $stmtInsert->execute([
-                $rel["source"],
-                $rel["target"],
-                $rel["type_relation"],
-                $rel["direction"],
-                $rel["impact_source_vers_cible"],
-                $rel["impact_cible_vers_source"],
-                $rel["nature_relation"],
-                $rel["duree_relation"],
-                $id_utilisateur
-            ]);
-            $inserted++;
-        }
+        $stmtInsert->execute([
+            $rel["source"],
+            $rel["target"],
+            $rel["type_relation"],
+            $rel["direction"],
+            $rel["impact_source_vers_cible"],
+            $rel["impact_cible_vers_source"],
+            $rel["nature_relation"],
+            $rel["duree_relation"],
+            $id_utilisateur
+        ]);
+        $inserted++;
     }
 
     echo json_encode([

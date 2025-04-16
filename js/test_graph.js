@@ -106,8 +106,8 @@ function submitRelationDetails() {
   const label = document.getElementById("popupType").value || "Relation";
   const impactSrcCible = document.getElementById("popupImpactSrcCible").value;
   const impactCibleSrc = document.getElementById("popupImpactCibleSrc")
-  ? document.getElementById("popupImpactCibleSrc").value
-  : null;
+    ? document.getElementById("popupImpactCibleSrc").value
+    : null;
 
   const nature = document.getElementById("popupNature").value;
   const duree = parseInt(document.getElementById("popupDuree").value) || 0;
@@ -116,6 +116,8 @@ function submitRelationDetails() {
   const styleSrc = getLineStyleByImpact(impactSrcCible);
   const styleCible = getLineStyleByImpact(impactCibleSrc);
 
+  const uid = Date.now(); // uid temporaire côté client (sera ignoré si non utilisé)
+
   const edgeData = {
     ...tempEdgeData,
     label,
@@ -123,9 +125,11 @@ function submitRelationDetails() {
     impact_source_vers_cible: impactSrcCible,
     impact_cible_vers_source: impactCibleSrc,
     nature_relation: nature,
-    duree_relation: duree
+    duree_relation: duree,
+    uid: uid
   };
 
+  // Flèche principale
   const edge = cy.add({ group: 'edges', data: edgeData });
   edge.style({
     'line-color': color,
@@ -134,15 +138,18 @@ function submitRelationDetails() {
     'line-style': styleSrc.style
   });
 
+  // Si double, ajouter la flèche miroir (sans uid pour éviter double suppression)
   if (tempEdgeData.direction === "Double") {
-    const reverseData = {
-      ...edgeData,
-      id: edgeData.target + "-" + edgeData.source + "-" + Date.now(),
-      source: edgeData.target,
-      target: edgeData.source
-    };
+    const reverseEdge = cy.add({
+      group: 'edges',
+      data: {
+        ...edgeData,
+        id: edgeData.target + "-" + edgeData.source + "-" + Date.now(),
+        source: edgeData.target,
+        target: edgeData.source
+      }
+    });
 
-    const reverseEdge = cy.add({ group: 'edges', data: reverseData });
     reverseEdge.style({
       'line-color': color,
       'target-arrow-color': color,
@@ -151,69 +158,63 @@ function submitRelationDetails() {
     });
   }
 
-  
-
-  cancelRelation(); // Ferme le popup
+  cancelRelation(); // Ferme le formulaire
 }
-
-
 
 document.addEventListener("DOMContentLoaded", () => {
   cy = cytoscape({
     container: document.getElementById('cy'),
     elements: [],
     layout: { name: 'breadthfirst', directed: true },
-    style: [
-      {
-        selector: 'node',
-        style: {
-          'shape': 'round-rectangle',
-          'background-color': '#0074D9',
-          'label': 'data(label)',
-          'color': 'white',
-          'text-valign': 'center',
-          'text-halign': 'center',
-          'padding': '10px',
-          'border-color': '#003e7',
-          'border-width': 2,
-          'font-size': '13px',
-          'text-wrap': 'wrap',
-          'text-max-width': '160px',
-          'width': '150px',
-          'height': '50px',
-          'border-radius': '12px',
-          'shadow-blur': 10,
-          'shadow-color': '#333',
-          'shadow-offset-x': 2,
-          'shadow-offset-y': 2,
-          'text-outline-color': '#003e7e',
-          'text-outline-width': 1
-        }
-      },
-      {
-        selector: 'edge',
-        style: {
-          'curve-style': 'bezier',
-          'target-arrow-shape': 'triangle',
-          'line-color': '#999',
-          'target-arrow-color': '#999',
-          'width': 2,
-          'label': 'data(label)',
-          'font-size': '10px'
-        }
-      },
-      {
-        selector: '.hierarchie',
-        style: {
-          'line-color': '#666',
-          'target-arrow-color': '#666',
-          'target-arrow-shape': 'triangle',
-          'curve-style': 'bezier',
-          'width': 2,
-          'line-style': 'solid'
-        }
+    style: [ {
+      selector: 'node',
+      style: {
+        'shape': 'round-rectangle',
+        'background-color': '#0074D9',
+        'label': 'data(label)',
+        'color': 'white',
+        'text-valign': 'center',
+        'text-halign': 'center',
+        'padding': '10px',
+        'border-color': '#003e7',
+        'border-width': 2,
+        'font-size': '13px',
+        'text-wrap': 'wrap',
+        'text-max-width': '160px',
+        'width': '150px',
+        'height': '50px',
+        'border-radius': '12px',
+        'shadow-blur': 10,
+        'shadow-color': '#333',
+        'shadow-offset-x': 2,
+        'shadow-offset-y': 2,
+        'text-outline-color': '#003e7e',
+        'text-outline-width': 1
       }
-    ]
+    },
+    {
+      selector: 'edge',
+      style: {
+        'curve-style': 'bezier',
+        'target-arrow-shape': 'triangle',
+        'line-color': '#999',
+        'target-arrow-color': '#999',
+        'width': 2,
+        'label': 'data(label)',
+        'font-size': '10px'
+      }
+    },
+    {
+      selector: '.hierarchie',
+      style: {
+        'line-color': '#666',
+        'target-arrow-color': '#666',
+        'target-arrow-shape': 'triangle',
+        'curve-style': 'bezier',
+        'width': 2,
+        'line-style': 'solid'
+      }
+    } ]
   });
 
   Promise.all([
@@ -222,22 +223,23 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch('../php/get_relations_informelles.php').then(res => res.json())
   ])
   .then(([acteurs, relationsHierarchiques, relationsInformelles]) => {
-    const elements = [];
-  
-    // Acteurs (noeuds)
+    const hierarchyElements = [];
+    const informelleElements = [];
+
+    // Ajout des acteurs (noeuds)
     acteurs.forEach(a => {
       const nodeId = 'act_' + a.id_acteur;
-      elements.push({
+      hierarchyElements.push({
         data: {
           id: nodeId,
           label: a.prenom + ' ' + a.nom
         }
       });
     });
-  
+
     // Relations hiérarchiques
     relationsHierarchiques.forEach(r => {
-      elements.push({
+      hierarchyElements.push({
         data: {
           id: `link_${r.to}_${r.from}_${Date.now()}`,
           source: r.to,
@@ -247,18 +249,30 @@ document.addEventListener("DOMContentLoaded", () => {
         classes: 'hierarchie'
       });
     });
-  
-    // Relations informelles
-    if (!Array.isArray(relationsInformelles)) {
-      console.error("❌ relationsInformelles n’est pas un tableau :", relationsInformelles);
-    } else {
+
+    // ➕ Ajoute la hiérarchie uniquement
+    cy.add(hierarchyElements);
+
+    // ➕ Applique le layout hiérarchique uniquement sur les relations hiérarchiques
+    cy.layout({
+      name: 'breadthfirst',
+      directed: true,
+      spacingFactor: 1.4,
+      roots: cy.nodes().filter(node =>
+        cy.edges('[target = "' + node.id() + '"]').length === 0
+      ),
+      animate: true,
+      orientation: 'vertical'
+    }).run();
+
+    // Relations informelles ensuite (sans relayout)
+    if (Array.isArray(relationsInformelles)) {
       relationsInformelles.forEach(rel => {
         const color = getColorByNature(rel.nature_relation);
         const styleSrc = getLineStyleByImpact(rel.impact_source_vers_cible);
         const styleCible = getLineStyleByImpact(rel.impact_cible_vers_source);
-  
-        // Flèche source → cible
-        elements.push({
+
+        informelleElements.push({
           data: {
             id: "rel_" + rel.uid,
             uid: rel.uid,
@@ -278,10 +292,9 @@ document.addEventListener("DOMContentLoaded", () => {
             'line-style': styleSrc.style
           }
         });
-  
-        // Flèche retour si double
+
         if (rel.direction === "Double") {
-          elements.push({
+          informelleElements.push({
             data: {
               id: "rel_" + rel.uid + "_reverse",
               uid: rel.uid,
@@ -303,26 +316,17 @@ document.addEventListener("DOMContentLoaded", () => {
           });
         }
       });
+
+      cy.add(informelleElements); // Ajout sans relancer le layout
     }
-  
-    // ➕ Ajout de tous les éléments d'un coup
-    cy.add(elements);
-  
-    // 🔃 Layout
-    cy.layout({
-      name: 'breadthfirst',
-      directed: true,
-      spacingFactor: 1.4,
-      roots: cy.nodes().filter(node => cy.edges('[target = "' + node.id() + '"]').length === 0),
-      animate: true,
-      orientation: 'vertical'
-    }).run();
+
+    setupMenu();
   })
   .catch(err => console.error("Erreur de chargement :", err));
-  
-
-  setupMenu();
 });
+
+
+
 
 function setupMenu() {
   document.getElementById("linkSimpleBtn").onclick = () => {
@@ -336,23 +340,41 @@ function setupMenu() {
   };
 
   document.getElementById("deleteSelectedBtn").onclick = () => {
-    if (confirm("Voulez-vous vraiment supprimer cette relation ?")) {
+    if (confirm(
+      "Voulez-vous supprimer cette relation ?\n\n" +
+      "Si vous supprimez une flèche d'une relation double, toute la relation sera supprimée."
+    )) {
+    
       const selected = cy.$(':selected');
+  
       selected.forEach(el => {
         if (el.isEdge() && !el.hasClass("hierarchie")) {
           const uid = el.data("uid");
-          if (uid) {
+  
+          // 🔒 Vérifie si cette relation a déjà été marquée pour suppression
+          if (uid && !deletedRelationIds.includes(uid)) {
             deletedRelationIds.push(uid);
+  
+            // 🧠 Si c'est une relation double (flèche aller + retour),
+            // alors on doit supprimer aussi la flèche inverse visuelle
+            const direction = el.data("direction");
+            if (direction === "Double") {
+              const reverse = cy.edges().filter(e =>
+                e.data("uid") === uid &&
+                e.id() !== el.id() // on ne supprime pas deux fois le même edge
+              );
+              reverse.remove(); // ❌ supprime la flèche visuelle miroir
+            }
           }
-          
-
         }
       });
+  
+      // ❌ Enfin, supprime la flèche sélectionnée
       selected.remove();
     }
   };
-
   
+
   
   
 
