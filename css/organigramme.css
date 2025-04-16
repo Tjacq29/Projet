@@ -141,3 +141,12 @@ body.org-background {
     background-color: #2e86c1;
   }
   
+  h2 {
+    text-align: center;
+    color: #71aff6;
+    margin-bottom: 25px;
+    font-size: 28px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}

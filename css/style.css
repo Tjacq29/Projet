@@ -18,10 +18,12 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 80px;
+    height: auto;
     background: #1B2030;
     width: 100%;
-    padding: 0 20px;
+    padding: 15px 20px;
+    min-height: 80px;
+    
 }
 
 /* ---- LOGO ORFI ---- */
@@ -204,4 +206,35 @@ footer {
     height: auto; /* Garde les proportions */
     display: block;
     margin: 10px auto; /* Centre l’image */
+}
+.custom-dialog {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    background: rgba(27, 32, 48, 0.95);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    display: none;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.custom-dialog.show {
+    display: flex;
+}
+
+.custom-dialog a {
+    font-size: 1.2em;
+    text-align: center;
+    margin: 10px;
+    padding: 5px;
+    font-weight: 600;
+    color: white;
+    text-decoration: none;
+}
+
+.custom-dialog a:hover {
+    text-decoration: underline;
+    color: #ddd;
 }
