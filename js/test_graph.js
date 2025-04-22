@@ -164,6 +164,7 @@ function submitRelationDetails() {
 document.addEventListener("DOMContentLoaded", () => {
   cy = cytoscape({
     container: document.getElementById('cy'),
+    boxSelectionEnabled: true,
     elements: [],
     layout: { name: 'breadthfirst', directed: true },
     style: [ {
@@ -214,7 +215,22 @@ document.addEventListener("DOMContentLoaded", () => {
         'width': 2,
         'line-style': 'solid'
       }
-    } ]
+    },
+    {
+      selector: '.zoneContour',
+      style: {
+        'background-opacity': 0,
+        'border-width': 3,
+        'border-style': 'dashed',
+        'border-color': '#2ecc71', // valeur par défaut (vert)
+        'label': 'data(label)',
+        'text-valign': 'top',
+        'text-halign': 'center',
+        'font-size': 14,
+        'color': '#444'
+      }
+    }
+     ]
   });
 
   Promise.all([
@@ -452,6 +468,9 @@ function setupMenu() {
   
 
   setupColorPanel();
+  // ➕ EMOJI SUR RELATION
+  
+
 }
 
 function setupColorPanel() {
@@ -468,6 +487,36 @@ function setupColorPanel() {
     panel.appendChild(btn);
   });
 }
+
+function creerZoneContour(type = "alliance") {
+  const selectedNodes = cy.nodes(":selected");
+
+  if (selectedNodes.length < 2) {
+    alert("Sélectionne au moins deux acteurs pour créer une zone.");
+    return;
+  }
+
+  const idZone = "zone_" + Date.now();
+  const couleur = type === "tension" ? "#e74c3c" : "#2ecc71";
+  const etiquette = type === "tension" ? " TENSION - - -" : " ALLIANCE + + +";
+
+  // Ajouter le compound node
+  cy.add({
+    group: 'nodes',
+    data: { id: idZone, label: etiquette },
+    classes: 'zoneContour',
+    position: { x: 0, y: 0 } // inutile, auto-géré
+  });
+
+  // Définir comme parent des noeuds sélectionnés
+  selectedNodes.forEach(node => {
+    node.move({ parent: idZone });
+  });
+
+  // Appliquer la couleur de bordure
+  cy.$id(idZone).style({ 'border-color': couleur });
+}
+
 
 document.getElementById("submitToProfBtn").onclick = () => {
   const userId = sessionStorage.getItem("userId");
@@ -502,3 +551,23 @@ document.getElementById("submitToProfBtn").onclick = () => {
     alert("Erreur lors de l’envoi du graphe.");
   });
 };
+
+
+
+function supprimerZoneContour() {
+  const selected = cy.nodes(":selected");
+  const zone = selected.filter(n => n.hasClass("zoneContour"));
+
+  if (zone.length === 0) {
+    alert("Sélectionne une zone (bordure) à supprimer.");
+    return;
+  }
+
+  const zoneId = zone[0].id();
+
+  // Détacher les enfants
+  cy.nodes(`[parent = "${zoneId}"]`).move({ parent: null });
+
+  // Supprimer la zone
+  zone.remove();
+}
