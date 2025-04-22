@@ -3,55 +3,64 @@ let cy;
 let selectedTool = null;
 let tempFromNode = null;
 let selectedColor = null;
+let deletedRelationIds = [];
 
-// Formulaire contextuel HTML injecté dynamiquement
-const popupFormHTML = `
-  <div id="relationForm" style="
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    border: 2px solid #0074D9;
-    box-shadow: 0 0 15px rgba(0,0,0,0.3);
-    z-index: 9999;
-  ">
-    <h4>Détails de la relation</h4>
-    <label>Type :</label>
-    <input type="text" id="popupType" placeholder="ex: Influence, Amitié..." style="width:100%"><br><br>
-    
-    <label>Impact Source → Cible :</label>
-    <select id="popupImpactSrcCible" style="width:100%">
-      <option value="Faible">Faible</option>
-      <option value="Moyen" selected>Moyen</option>
-      <option value="Fort">Fort</option>
-    </select><br><br>
 
-    <label>Impact Cible → Source :</label>
-    <select id="popupImpactCibleSrc" style="width:100%">
-      <option value="Faible">Faible</option>
-      <option value="Moyen" selected>Moyen</option>
-      <option value="Fort">Fort</option>
-    </select><br><br>
 
-    <label>Nature :</label>
-    <select id="popupNature" style="width:100%">
-      <option value="Positive">Positive</option>
-      <option value="Négative">Négative</option>
-      <option value="Neutre" selected>Neutre</option>
-    </select><br><br>
-
-    <label>Durée (mois) :</label>
-    <input type="number" id="popupDuree" min="0" value="0" style="width:100%"><br><br>
-
-    <button onclick="submitRelationDetails()">✅ Valider</button>
-    <button onclick="cancelRelation()">❌ Annuler</button>
-  </div>
-`;
 
 let tempEdgeData = null;
 let lastFrom = null;
 let lastTo = null;
+
+function getPopupFormHTML(direction) {
+  const isDouble = direction === "Double";
+
+  return `
+    <div id="relationForm" style="
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border: 2px solid #0074D9;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      z-index: 9999;
+    ">
+      <h4>Détails de la relation</h4>
+      <label>Type :</label>
+      <input type="text" id="popupType" placeholder="ex: Influence, Amitié..." style="width:100%"><br><br>
+
+      <label>Impact Source → Cible :</label>
+      <select id="popupImpactSrcCible" style="width:100%">
+        <option value="Faible">Faible</option>
+        <option value="Moyen" selected>Moyen</option>
+        <option value="Fort">Fort</option>
+      </select><br><br>
+
+      ${isDouble ? `
+      <label>Impact Cible → Source :</label>
+      <select id="popupImpactCibleSrc" style="width:100%">
+        <option value="Faible">Faible</option>
+        <option value="Moyen" selected>Moyen</option>
+        <option value="Fort">Fort</option>
+      </select><br><br>` : ''}
+
+      <label>Nature :</label>
+      <select id="popupNature" style="width:100%">
+        <option value="Positive">Positive</option>
+        <option value="Négative">Négative</option>
+        <option value="Neutre" selected>Neutre</option>
+      </select><br><br>
+
+      <label>Durée (mois) :</label>
+      <input type="number" id="popupDuree" min="0" value="0" style="width:100%"><br><br>
+
+      <button onclick="submitRelationDetails()">Valider</button>
+      <button onclick="cancelRelation()">Annuler</button>
+    </div>
+  `;
+}
+
 
 function createRelationPopup(fromId, toId, direction) {
   if (document.getElementById("relationForm")) return;
@@ -66,7 +75,7 @@ function createRelationPopup(fromId, toId, direction) {
     direction
   };
 
-  document.body.insertAdjacentHTML("beforeend", popupFormHTML);
+  document.body.insertAdjacentHTML("beforeend", getPopupFormHTML(direction));
 }
 
 function cancelRelation() {
@@ -96,13 +105,18 @@ function getLineStyleByImpact(impact) {
 function submitRelationDetails() {
   const label = document.getElementById("popupType").value || "Relation";
   const impactSrcCible = document.getElementById("popupImpactSrcCible").value;
-  const impactCibleSrc = document.getElementById("popupImpactCibleSrc").value;
+  const impactCibleSrc = document.getElementById("popupImpactCibleSrc")
+    ? document.getElementById("popupImpactCibleSrc").value
+    : null;
+
   const nature = document.getElementById("popupNature").value;
   const duree = parseInt(document.getElementById("popupDuree").value) || 0;
 
   const color = getColorByNature(nature);
   const styleSrc = getLineStyleByImpact(impactSrcCible);
   const styleCible = getLineStyleByImpact(impactCibleSrc);
+
+  const uid = Date.now(); // uid temporaire côté client (sera ignoré si non utilisé)
 
   const edgeData = {
     ...tempEdgeData,
@@ -111,9 +125,11 @@ function submitRelationDetails() {
     impact_source_vers_cible: impactSrcCible,
     impact_cible_vers_source: impactCibleSrc,
     nature_relation: nature,
-    duree_relation: duree
+    duree_relation: duree,
+    uid: uid
   };
 
+  // Flèche principale
   const edge = cy.add({ group: 'edges', data: edgeData });
   edge.style({
     'line-color': color,
@@ -122,15 +138,18 @@ function submitRelationDetails() {
     'line-style': styleSrc.style
   });
 
+  // Si double, ajouter la flèche miroir (sans uid pour éviter double suppression)
   if (tempEdgeData.direction === "Double") {
-    const reverseData = {
-      ...edgeData,
-      id: edgeData.target + "-" + edgeData.source + "-" + Date.now(),
-      source: edgeData.target,
-      target: edgeData.source
-    };
+    const reverseEdge = cy.add({
+      group: 'edges',
+      data: {
+        ...edgeData,
+        id: edgeData.target + "-" + edgeData.source + "-" + Date.now(),
+        source: edgeData.target,
+        target: edgeData.source
+      }
+    });
 
-    const reverseEdge = cy.add({ group: 'edges', data: reverseData });
     reverseEdge.style({
       'line-color': color,
       'target-arrow-color': color,
@@ -139,83 +158,78 @@ function submitRelationDetails() {
     });
   }
 
-  
-
-  cancelRelation(); // Ferme le popup
+  cancelRelation(); // Ferme le formulaire
 }
-
-
 
 document.addEventListener("DOMContentLoaded", () => {
   cy = cytoscape({
     container: document.getElementById('cy'),
     elements: [],
     layout: { name: 'breadthfirst', directed: true },
-    style: [
-      {
-        selector: 'node',
-        style: {
-          'shape': 'round-rectangle',
-          'background-color': '#0074D9',
-          'label': 'data(label)',
-          'color': 'white',
-          'text-valign': 'center',
-          'text-halign': 'center',
-          'padding': '10px',
-          'border-color': '#003e7',
-          'border-width': 2,
-          'font-size': '13px',
-          'text-wrap': 'wrap',
-          'text-max-width': '160px',
-          'width': '150px',
-          'height': '50px',
-          'border-radius': '12px',
-          'shadow-blur': 10,
-          'shadow-color': '#333',
-          'shadow-offset-x': 2,
-          'shadow-offset-y': 2,
-          'text-outline-color': '#003e7e',
-          'text-outline-width': 1
-        }
-      },
-      {
-        selector: 'edge',
-        style: {
-          'curve-style': 'bezier',
-          'target-arrow-shape': 'triangle',
-          'line-color': '#999',
-          'target-arrow-color': '#999',
-          'width': 2,
-          'label': 'data(label)',
-          'font-size': '10px'
-        }
-      },
-      {
-        selector: '.hierarchie',
-        style: {
-          'line-color': '#666',
-          'target-arrow-color': '#666',
-          'target-arrow-shape': 'triangle',
-          'curve-style': 'bezier',
-          'width': 2,
-          'line-style': 'solid'
-        }
+    style: [ {
+      selector: 'node',
+      style: {
+        'shape': 'round-rectangle',
+        'background-color': '#0074D9',
+        'label': 'data(label)',
+        'color': 'white',
+        'text-valign': 'center',
+        'text-halign': 'center',
+        'padding': '10px',
+        'border-color': '#003e7',
+        'border-width': 2,
+        'font-size': '13px',
+        'text-wrap': 'wrap',
+        'text-max-width': '160px',
+        'width': '150px',
+        'height': '50px',
+        'border-radius': '12px',
+        'shadow-blur': 10,
+        'shadow-color': '#333',
+        'shadow-offset-x': 2,
+        'shadow-offset-y': 2,
+        'text-outline-color': '#003e7e',
+        'text-outline-width': 1
       }
-    ]
+    },
+    {
+      selector: 'edge',
+      style: {
+        'curve-style': 'bezier',
+        'target-arrow-shape': 'triangle',
+        'line-color': '#999',
+        'target-arrow-color': '#999',
+        'width': 2,
+        'label': 'data(label)',
+        'font-size': '10px'
+      }
+    },
+    {
+      selector: '.hierarchie',
+      style: {
+        'line-color': '#666',
+        'target-arrow-color': '#666',
+        'target-arrow-shape': 'triangle',
+        'curve-style': 'bezier',
+        'width': 2,
+        'line-style': 'solid'
+      }
+    } ]
   });
 
   Promise.all([
     fetch('../php/dashboard.php').then(res => res.json()),
-    fetch('../php/get_relations_hierarchiques.php').then(res => res.json())
+    fetch('../php/get_relations_hierarchiques.php').then(res => res.json()),
+    fetch('../php/get_relations_informelles.php').then(res => res.json())
   ])
-  .then(([acteurs, relations]) => {
-    const elements = [];
-    const ids = new Set();
+  .then(([acteurs, relationsHierarchiques, relationsInformelles]) => {
+    const hierarchyElements = [];
+    const informelleElements = [];
 
+    // Ajout des acteurs (noeuds)
     acteurs.forEach(a => {
       const nodeId = 'act_' + a.id_acteur;
-      ids.add(nodeId);
-      elements.push({
+      hierarchyElements.push({
         data: {
           id: nodeId,
           label: a.prenom + ' ' + a.nom
@@ -223,34 +237,96 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    relations.forEach(r => {
-      const fromId = r.from;
-      const toId = r.to;
-      elements.push({
+    // Relations hiérarchiques
+    relationsHierarchiques.forEach(r => {
+      hierarchyElements.push({
         data: {
-          id: `link_${toId}_${fromId}_${Date.now()}`,
-          source: toId,
-          target: fromId,
+          id: `link_${r.to}_${r.from}_${Date.now()}`,
+          source: r.to,
+          target: r.from,
           label: r.type || ""
         },
         classes: 'hierarchie'
       });
     });
 
-    cy.add(elements);
+    // ➕ Ajoute la hiérarchie uniquement
+    cy.add(hierarchyElements);
+
+    // ➕ Applique le layout hiérarchique uniquement sur les relations hiérarchiques
     cy.layout({
       name: 'breadthfirst',
       directed: true,
       spacingFactor: 1.4,
-      roots: cy.nodes().filter(node => cy.edges('[target = "' + node.id() + '"]').length === 0),
+      roots: cy.nodes().filter(node =>
+        cy.edges('[target = "' + node.id() + '"]').length === 0
+      ),
       animate: true,
       orientation: 'vertical'
     }).run();
+
+    // Relations informelles ensuite (sans relayout)
+    if (Array.isArray(relationsInformelles)) {
+      relationsInformelles.forEach(rel => {
+        const color = getColorByNature(rel.nature_relation);
+        const styleSrc = getLineStyleByImpact(rel.impact_source_vers_cible);
+        const styleCible = getLineStyleByImpact(rel.impact_cible_vers_source);
+
+        informelleElements.push({
+          data: {
+            id: "rel_" + rel.uid,
+            uid: rel.uid,
+            source: rel.from,
+            target: rel.to,
+            label: rel.type_relation,
+            direction: rel.direction,
+            impact_source_vers_cible: rel.impact_source_vers_cible,
+            impact_cible_vers_source: rel.impact_cible_vers_source,
+            nature_relation: rel.nature_relation,
+            duree_relation: rel.duree_relation
+          },
+          style: {
+            'line-color': color,
+            'target-arrow-color': color,
+            'width': styleSrc.width,
+            'line-style': styleSrc.style
+          }
+        });
+
+        if (rel.direction === "Double") {
+          informelleElements.push({
+            data: {
+              id: "rel_" + rel.uid + "_reverse",
+              uid: rel.uid,
+              source: rel.to,
+              target: rel.from,
+              label: rel.type_relation,
+              direction: rel.direction,
+              impact_source_vers_cible: rel.impact_cible_vers_source,
+              impact_cible_vers_source: rel.impact_source_vers_cible,
+              nature_relation: rel.nature_relation,
+              duree_relation: rel.duree_relation
+            },
+            style: {
+              'line-color': color,
+              'target-arrow-color': color,
+              'width': styleCible.width,
+              'line-style': styleCible.style
+            }
+          });
+        }
+      });
+
+      cy.add(informelleElements); // Ajout sans relancer le layout
+    }
+
+    setupMenu();
   })
   .catch(err => console.error("Erreur de chargement :", err));
-
-  setupMenu();
 });
+
+
+
 
 function setupMenu() {
   document.getElementById("linkSimpleBtn").onclick = () => {
@@ -264,8 +340,43 @@ function setupMenu() {
   };
 
   document.getElementById("deleteSelectedBtn").onclick = () => {
-    cy.$(':selected').remove();
+    if (confirm(
+      "Voulez-vous supprimer cette relation ?\n\n" +
+      "Si vous supprimez une flèche d'une relation double, toute la relation sera supprimée."
+    )) {
+    
+      const selected = cy.$(':selected');
+  
+      selected.forEach(el => {
+        if (el.isEdge() && !el.hasClass("hierarchie")) {
+          const uid = el.data("uid");
+  
+          // 🔒 Vérifie si cette relation a déjà été marquée pour suppression
+          if (uid && !deletedRelationIds.includes(uid)) {
+            deletedRelationIds.push(uid);
+  
+            // 🧠 Si c'est une relation double (flèche aller + retour),
+            // alors on doit supprimer aussi la flèche inverse visuelle
+            const direction = el.data("direction");
+            if (direction === "Double") {
+              const reverse = cy.edges().filter(e =>
+                e.data("uid") === uid &&
+                e.id() !== el.id() // on ne supprime pas deux fois le même edge
+              );
+              reverse.remove(); // ❌ supprime la flèche visuelle miroir
+            }
+          }
+        }
+      });
+  
+      // ❌ Enfin, supprime la flèche sélectionnée
+      selected.remove();
+    }
   };
+  
+
+  
+  
 
   cy.on('tap', 'node', (e) => {
     const node = e.target;
@@ -309,31 +420,42 @@ function setupMenu() {
         });
       }
     });
-
+  
     fetch("../php/save_relation_informelle.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(relationsToSave)
+      body: JSON.stringify({
+        relations: relationsToSave,
+        toDelete: deletedRelationIds
+      })
     })
-    .then(res => res.json())
-    .then(data => {
-      alert(data.success
-        ? ` ${data.relations_inserted} relation(s) enregistrée(s).`
-        : ` Erreur : ${data.error || 'inconnue'}`);
-    })
+    .then(res => res.text()) // récupère en texte brut
+    .then(text => {
+      console.log("Réponse brute du serveur :", text); // 🔍 tu verras l'erreur ici
+
+      const response = JSON.parse(text); // tu le parses à la main
+      alert(response.success
+        ? ` ${response.relations_inserted} relation(s) enregistrée(s).`
+        : ` Erreur : ${response.error || 'inconnue'}`);
+
+  deletedRelationIds = [];
+})
+
+    
     .catch(err => {
       console.error("Erreur serveur :", err);
       alert(" Problème de communication avec le serveur.");
     });
   };
+  
 
   setupColorPanel();
 }
 
 function setupColorPanel() {
-  const colors = ["#58B19F", "#f8c291", "#82ccdd", "#f6b93b", "#F97F51", "#a29bfe", "#ff7675", "#00b894"];
+  const colors = ["#58B19F", "#f8c291", "#82ccdd", "#f6b93b", "#F97F51", "#a29bfe", "#ff7675"];
   const panel = document.getElementById("colorPanel");
   colors.forEach(color => {
     const btn = document.createElement("button");
@@ -346,3 +468,37 @@ function setupColorPanel() {
     panel.appendChild(btn);
   });
 }
+
+document.getElementById("submitToProfBtn").onclick = () => {
+  const userId = sessionStorage.getItem("userId");
+  if (!userId) {
+    alert("Vous devez être connecté.");
+    return;
+  }
+
+  const imageData = cy.png({ scale: 2, output: 'blob' }); // export Cytoscape en image
+  const formData = new FormData();
+  formData.append("image", imageData, "graph_informel.png");
+  formData.append("id_utilisateur", userId);
+  formData.append("type_schema", "informelle");
+  formData.append("nom", "graphe_informel_" + Date.now());
+
+  fetch("../php/save_graph_with_image.php", {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert("Graphe informel envoyé au professeur !");
+      const role = sessionStorage.getItem("role");
+      if (role === "prof") window.location.href = "../html/admin_view.html";
+    } else {
+      alert("Erreur : " + data.message);
+    }
+  })
+  .catch(err => {
+    console.error("Erreur :", err);
+    alert("Erreur lors de l’envoi du graphe.");
+  });
+};

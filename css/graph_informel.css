@@ -1,108 +1,44 @@
-/* ====== BASE ====== */
-body, html {
-  margin: 0;
-  padding: 0;
-  height: 100vh;
-  font-family: "Poppins", sans-serif;
-}
-
-/* ====== CONTAINER PRINCIPAL ====== */
-.diagram-container {
-  display: flex;
-  flex-direction: row;
-  height: 100vh;
-  gap: 0;
-}
-
-/* ====== ZONE DIAGRAMME ====== */
-#myDiagramDiv {
-  flex-grow: 1;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 0;
-  height: 100%;
-}
-
-/* ====== TOOLBOX ====== */
-.toolbox {
-  width: 320px;
-  background: white;
+.panel {
+  width: 260px;
   padding: 20px;
-  border-left: 1px solid #ddd;
-  box-shadow: -2px 0 8px rgba(0,0,0,0.05);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  overflow-y: auto;
+  background: #f1f3f6;
+  border-right: 1px solid #ccc;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
 }
 
-.toolbox h3 {
-  margin-top: 0;
-  color: #111;
+.panel h4 {
+  margin-top: 20px;
+  font-size: 15px;
+  color: #333;
 }
 
-.toolbox button {
-  padding: 10px;
-  border: none;
-  border-radius: 6px;
-  background-color: #4a90e2;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.toolbox button:hover {
-  background-color: #357ABD;
-}
-
-.toolbox label {
-  font-weight: 500;
-  display: block;
+.panel label {
   margin-top: 10px;
+  font-weight: bold;
+  display: block;
+  font-size: 13px;
 }
 
-.toolbox input[type="range"] {
-  width: 100%;
-  margin-top: 6px;
-}
-
-.toolbox input[type="text"] {
-  width: 100%;
-  padding: 6px;
-  margin-top: 6px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.toolbox select {
-  padding: 5px;
-  margin-left: 5px;
-}
-
-/* ====== COULEURS ====== */
-#colorPanel {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.color-choice {
-  width: 26px;
-  height: 26px;
+.panel button {
+  padding: 6px 10px;
   border: none;
-  border-radius: 5px;
+  background-color: #0074D9;
+  color: white;
+  border-radius: 4px;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  font-size: 14px;
+  margin-bottom: 5px;
 }
 
-.color-choice:hover {
-  transform: scale(1.1);
+.panel button:hover {
+  background-color: #005fa3;
 }
 
-/* ====== COMMENTAIRES / AFFINITÉS ====== */
-.toolbox label span {
-  display: inline-block;
-  width: 20px;
+.panel input,
+.panel select {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 13px;
+  margin-top: 4px;
 }

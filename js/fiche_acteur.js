@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("ficheContainer");
     const nomTitre = document.getElementById("acteurNom");
     let radarChartInstance = null;
-  
+
     // Charger la liste des acteurs au chargement
     fetch('../php/get_acteurs_utilisateur.php')
       .then(res => res.json())
@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(res => res.json())
             .then(data => afficherRelations(data));
         });
-    });
+      });
   
     function afficherRadar(radar) {
       const ctx = document.getElementById("radarChart").getContext("2d");
@@ -117,20 +117,28 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
   
+    
     function afficherRelations(relations) {
       const tbody = document.getElementById("tableRelations");
       tbody.innerHTML = "";
       relations.forEach(rel => {
+        const nomRelation = rel.nom_autre || 'Inconnu';
+        const impactA = rel.impactA;
+        const impactB = rel.impactB;
+        const nature = rel.nature_relation || 'Neutre';
+    
         const row = `<tr>
-            <td>${rel.nom_cible ? rel.nom_cible : (rel.nom_superieur ? rel.nom_superieur : 'Inconnu')}</td>
-            <td>${rel.type_relation}</td>
-            <td style="color:${getColor(rel.nature_relation)};">${rel.nature_relation ? rel.nature_relation : 'Neutre'}</td>
-            <td>${rel.impactA}</td>
-            <td>${rel.impactB}</td>
-            <td>${rel.duree_relation ? rel.duree_relation : '-'}</td>
+          <td>${nomRelation}</td>
+          <td>${rel.type_relation}</td>
+          <td style="color:${getColor(nature)};">${nature}</td>
+          <td>${impactA}</td>
+          <td>${impactB}</td>
+          <td>${rel.duree_relation || '-'}</td>
         </tr>`;
         tbody.insertAdjacentHTML("beforeend", row);
-      });
+      
+      }); // ← fin du forEach
     }
+
   });
-  
+    

@@ -1,7 +1,7 @@
 Array
 (
-    [id_utilisateur] => 18
-    [nom] => Titouan
-    [prenom] => JACQ
-    [role] => eleve
+    [id_utilisateur] => 15
+    [nom] => lec
+    [prenom] => celem
+    [role] => prof
 )

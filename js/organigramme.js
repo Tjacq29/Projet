@@ -139,34 +139,37 @@ function closeModal() {
 }
 
 function saveGraph() {
+  console.log("💾 saveGraph() appelée !");
   const userId = sessionStorage.getItem("userId");
   if (!userId) {
     alert("Non connecté !");
     return;
   }
 
-  const graphData = myDiagram.model.toJson();
-  const imageData = myDiagram.makeImageData({ scale: 1, background: "white" });
+  const imageDataURL = myDiagram.makeImageData({ scale: 1, background: "white" });
 
-  fetch(imageData)
-    .then(res => res.blob())
-    .then(blob => {
-      const formData = new FormData();
-      formData.append("image", blob, "graph.png");
-      formData.append("id_utilisateur", userId);
-      formData.append("json", graphData);
+  const blob = dataURLToBlob(imageDataURL); // Convertit la Data URL en Blob
 
-      return fetch("../php/save_graph_with_image.php", {
-        method: "POST",
-        body: formData
-      });
-    })
+  const formData = new FormData();
+  formData.append("image", blob, "organigramme.png");
+  formData.append("id_utilisateur", userId);
+  formData.append("type_schema", "hierarchique");
+  formData.append("nom", "organigramme_" + Date.now());
+
+  fetch("../php/save_graph_with_image.php", {
+    method: "POST",
+    body: formData
+  })
     .then(res => res.json())
     .then(data => {
       if (data.success) {
-        alert("Organigramme enregistré !");
+        alert("Organigramme enregistré avec succès !");
         const role = sessionStorage.getItem("role");
-        if (role === "prof") window.location.href = "../html/admin_view.html";
+        if (role === "prof") {
+          window.location.href = "../html/admin_view.html";
+        }
+      } else {
+        alert("Erreur : " + data.message);
       }
     })
     .catch(err => {
@@ -175,8 +178,19 @@ function saveGraph() {
     });
 }
 
+function dataURLToBlob(dataURL) {
+  const byteString = atob(dataURL.split(',')[1]);
+  const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+  return new Blob([ab], { type: mimeString });
+}
+
 function graph_informel() {
-  window.location.href = "../html/graph_informel.html";
+  window.location.href = "../html/test_graph.html";
 }
 
 fetch('../php/dashboard.php')
@@ -205,3 +219,15 @@ if (myDiagram) {
     myDiagram.commandHandler.decreaseZoom();
 }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("✅ JS chargé et DOM prêt");
+
+  const saveBtn = document.getElementById("saveGraphBtn");
+  if (saveBtn) {
+    console.log("✅ Bouton trouvé, ajout de l'action");
+    saveBtn.onclick = saveGraph;
+  } else {
+    console.log("❌ Bouton NON trouvé !");
+  }
+});
