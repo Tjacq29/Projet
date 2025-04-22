@@ -167,70 +167,65 @@ document.addEventListener("DOMContentLoaded", () => {
     boxSelectionEnabled: true,
     elements: [],
     layout: { name: 'breadthfirst', directed: true },
-    style: [ {
-      selector: 'node',
-      style: {
-        'shape': 'round-rectangle',
-        'background-color': '#0074D9',
-        'label': 'data(label)',
-        'color': 'white',
-        'text-valign': 'center',
-        'text-halign': 'center',
-        'padding': '10px',
-        'border-color': '#003e7',
-        'border-width': 2,
-        'font-size': '13px',
-        'text-wrap': 'wrap',
-        'text-max-width': '160px',
-        'width': '150px',
-        'height': '50px',
-        'border-radius': '12px',
-        'shadow-blur': 10,
-        'shadow-color': '#333',
-        'shadow-offset-x': 2,
-        'shadow-offset-y': 2,
-        'text-outline-color': '#003e7e',
-        'text-outline-width': 1
+    style: [
+      {
+        selector: 'node',
+        style: {
+          'shape': 'round-rectangle',
+          'background-color': '#d6d8db',
+          'label': 'data(label)',
+          'color': '#222',
+          'text-valign': 'center',
+          'text-halign': 'center',
+          'border-color': '#999',
+          'border-width': 2,
+          'font-size': '16px',
+          'text-wrap': 'wrap',
+          'text-max-width': '160px',
+          'width': '160px',
+          'height': '60px',
+          'text-outline-color': '#fff',
+          'text-outline-width': 0.5
+        }
+      },
+      {
+        selector: 'edge',
+        style: {
+          'curve-style': 'bezier',
+          'target-arrow-shape': 'triangle',
+          'line-color': '#999',
+          'target-arrow-color': '#999',
+          'width': 2,
+          'label': 'data(label)',
+          'font-size': '10px'
+        }
+      },
+      {
+        selector: '.hierarchie',
+        style: {
+          'line-color': '#666',
+          'target-arrow-color': '#666',
+          'target-arrow-shape': 'triangle',
+          'curve-style': 'bezier',
+          'width': 2,
+          'line-style': 'solid'
+        }
+      },
+      {
+        selector: '.zoneContour',
+        style: {
+          'background-opacity': 0,
+          'border-width': 3,
+          'border-style': 'dashed',
+          'border-color': '#2ecc71',
+          'label': 'data(label)',
+          'text-valign': 'top',
+          'text-halign': 'center',
+          'font-size': 14,
+          'color': '#444'
+        }
       }
-    },
-    {
-      selector: 'edge',
-      style: {
-        'curve-style': 'bezier',
-        'target-arrow-shape': 'triangle',
-        'line-color': '#999',
-        'target-arrow-color': '#999',
-        'width': 2,
-        'label': 'data(label)',
-        'font-size': '10px'
-      }
-    },
-    {
-      selector: '.hierarchie',
-      style: {
-        'line-color': '#666',
-        'target-arrow-color': '#666',
-        'target-arrow-shape': 'triangle',
-        'curve-style': 'bezier',
-        'width': 2,
-        'line-style': 'solid'
-      }
-    },
-    {
-      selector: '.zoneContour',
-      style: {
-        'background-opacity': 0,
-        'border-width': 3,
-        'border-style': 'dashed',
-        'border-color': '#2ecc71', // valeur par défaut (vert)
-        'label': 'data(label)',
-        'text-valign': 'top',
-        'text-halign': 'center',
-        'font-size': 14,
-        'color': '#444'
-      }
-    }
-     ]
+    ]
   });
 
   Promise.all([
@@ -238,6 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch('../php/get_relations_hierarchiques.php').then(res => res.json()),
     fetch('../php/get_relations_informelles.php').then(res => res.json())
   ])
+  
   .then(([acteurs, relationsHierarchiques, relationsInformelles]) => {
     const hierarchyElements = [];
     const informelleElements = [];
@@ -252,6 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     });
+    console.log("relationsHierarchiques =", relationsHierarchiques);
 
     // Relations hiérarchiques
     relationsHierarchiques.forEach(r => {

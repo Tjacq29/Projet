@@ -2,108 +2,32 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Graphique Informel </title>
   <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.26.0/dist/cytoscape.min.js"></script>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-
-    .container {
-      display: flex;
-      height: 100vh;
-    }
-
-    .panel {
-      width: 260px;
-      padding: 20px;
-      background: #f4f6f9;
-      border-right: 1px solid #ccc;
-      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
-    }
-
-    .panel h4 {
-      margin-top: 20px;
-      font-size: 15px;
-      color: #333;
-    }
-
-    .panel label {
-      margin-top: 10px;
-      font-weight: bold;
-      display: block;
-      font-size: 13px;
-      color: #333;
-    }
-
-    .panel button {
-      padding: 8px 10px;
-      border: none;
-      background-color: #0074D9;
-      color: white;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-      margin-top: 6px;
-      transition: background-color 0.2s;
-    }
-
-    .panel button:hover {
-      background-color: #005fa3;
-    }
-
-    .panel input,
-    .panel select {
-      padding: 6px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 13px;
-      margin-top: 4px;
-    }
-
-    .color-choice {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      border: 1px solid #ddd;
-      margin: 3px;
-      cursor: pointer;
-    }
-
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    #cy {
-      flex: 1;
-      height: 100%;
-      min-height: 600px;
-      background: #ffffff;
-    }
-
-    .legend {
-      padding: 20px;
-      background: #f4f6f9;
-      border-top: 1px solid #ccc;
-      font-size: 13px;
-      line-height: 1.4;
-    }
-
-    .legend div {
-      margin-bottom: 4px;
-    }
-  </style>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/test_graph.css">
 </head>
 
 <body>
-  <header style="background-color: #0074D9; padding: 15px; color: white; text-align: center;">
-    <h1 style="margin: 0; font-size: 22px;">Création du Graphe Informel</h1>
-    <p style="margin: 5px 0 0; font-size: 14px;">Visualisez et saisissez les relations informelles entre les acteurs</p>
-  </header>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="sides">
+        <a href="../html/index.html" class="logo">ORFI</a>
+    </div>
+    <div class="sides">
+        <div id="authButtons" class="login-icon"></div>            
+    </div>
+    <div class="sides">
+        <a href="#" class="menu" id="openMenu"></a>
+    </div>
+</div>
+
+<header class="graph-intro">
+  <h1>Création du Graphe Informel</h1>
+  <p>Visualisez et saisissez les relations informelles entre les acteurs</p>
+</header>
+
   
 <div class="container">
   <div class="panel">
@@ -194,6 +118,18 @@
     
   </div>
 </div>
+<!-- FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 ORFI.</p>
+            <nav>
+                <a href="../html/about.html">À propos</a> |
+                <a href="../html/course.html">Organisation Relationnelle</a> |
+                <a href="#">Contact</a>
+            </nav>
+        </div>
+    </footer>
+    
 
 <script src="../js/test_graph.js"></script>
 <script>
@@ -206,6 +142,7 @@
     title.innerHTML = isVisible ? "📘 Mode d’emploi ▶" : "📘 Mode d’emploi ▼";
   }
 </script>
+<script src="../js/script.js"></script>
 
 </body>
 </html>

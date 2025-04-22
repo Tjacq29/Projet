@@ -2,7 +2,9 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fiche Acteur</title>
+  <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/fiche_acteur.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -30,6 +32,19 @@
   </style>
 </head>
 <body>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="sides">
+        <a href="../html/index.html" class="logo">ORFI</a>
+    </div>
+    <div class="sides">
+        <div id="authButtons" class="login-icon"></div>            
+    </div>
+    <div class="sides">
+        <a href="#" class="menu" id="openMenu"></a>
+    </div>
+</div>
+
   <div class="section">
     <h2>Sélectionnez un acteur :</h2>
     <select id="selectActeur">
@@ -71,7 +86,22 @@
       </table>
     </div>
   </div>
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-content">
+        <p>&copy; 2025 ORFI.</p>
+        <nav>
+            <a href="../html/about.html">À propos</a> |
+            <a href="../html/course.html">Organisation Relationnelle</a> |
+            <a href="#">Contact</a>
+        </nav>
+    </div>
+</footer>
 
-  <script src="../js/fiche_acteur.js"></script>
+
+
+<script src="../js/fiche_acteur.js"></script>
+<script src="../js/script.js"></script>
+
 </body>
 </html>
