@@ -46,17 +46,19 @@ function loadActeurs() {
                 tbody.innerHTML += `
                     <tr>
                         <td>${acteur.id_acteur}</td>
-                        <td>${acteur.nom}</td>
-                        <td>${acteur.prenom}</td>
-                        <td>${acteur.age}</td>
-                        <td>${acteur.role_entreprise}</td>
-                        <td>${acteur.secteur}</td>
+                        <td>${acteur.nom || ""}</td>
+                        <td>${acteur.prenom || ""}</td>
+                        <td>${(acteur.age && acteur.age !== "null") ? acteur.age : ""}</td>
+                        <td>${(acteur.role_entreprise && acteur.role_entreprise !== "null") ? acteur.role_entreprise : ""}</td>
+                        <td>${(acteur.secteur && acteur.secteur !== "null") ? acteur.secteur : ""}</td>
                         <td>${acteur.id_acteur_superieur || "CEO"}</td>
                         <td>
                             <a class='btn btn-primary btn-sm' href='edit_acteur.html?id=${acteur.id_acteur}'>Modifier</a>
                             <button class='btn btn-danger btn-sm' onclick='removeActeur(${acteur.id_acteur})'>Supprimer</button>
                         </td>
-                    </tr>`;
+                    </tr>
+                `;
+
             });
         })
         .catch(error => console.error("Erreur lors du chargement :", error));

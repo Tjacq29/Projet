@@ -1,5 +1,5 @@
 <?php
-// dashboard.php corrigé
+// dashboard.php corrigé et propre
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -32,6 +32,16 @@ try {
 
     $stmt->execute(['id_utilisateur' => $id_utilisateur]);
     $acteurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Nettoie les NULL pour les remplacer par ""
+    foreach ($acteurs as &$acteur) {
+        foreach ($acteur as $key => $value) {
+            if (is_null($value)) {
+                $acteur[$key] = "";
+            }
+        }
+    }
+    unset($acteur); // Très important !
 
     echo json_encode($acteurs, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 } catch (Exception $e) {
