@@ -140,6 +140,39 @@
         </div>
     </footer>
     
+    <div id="modal" class="modal popup">
+      <span class="close" onclick="document.getElementById('modal').style.display='none'">✖</span>
+      <h3 id="modal-title"></h3>
+    
+      <label for="modal-role">Rôle</label>
+      <input id="modal-role" type="text">
+    
+      <label for="modal-age">Âge</label>
+      <input id="modal-age" type="number">
+    
+      <label for="modal-sector">Secteur</label>
+      <input id="modal-sector" type="text">
+    
+      <div id="modal-custom"></div>
+    
+      <button class="btn btn-secondary" id="add-field-btn"> Ajouter un champ</button>
+      <button class="btn btn-primary" id="save-btn"> Enregistrer</button>
+    </div>
+    <!-- Nouveau petit popup pour acteur -->
+    <div id="actorPopup" class="popup">
+      <span class="close" onclick="closeActorPopup()">✖</span>
+      <h3 id="actorName"></h3>
+      <label>Rôle</label>
+      <input id="actorRole" type="text">
+      <label>Âge</label>
+      <input id="actorAge" type="number">
+      <label>Secteur</label>
+      <input id="actorSector" type="text">
+      <div id="customFields"></div>
+      <button id="addCustomFieldBtn">Ajouter un champ</button>
+      <button id="saveActorBtn">Enregistrer</button>
+    </div>
+
 
 <script src="../js/test_graph.js"></script>
 <script>

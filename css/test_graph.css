@@ -161,3 +161,56 @@ body {
     color: #555;
   }
   
+  .popup {
+    display: none;
+    position: absolute; /* IMPORTANT : pas fixed */
+    transform: translate(-50%, -100%); /* centré et au-dessus du clic */
+    width: 300px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.25);
+    z-index: 1000;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .popup .close {
+    float: right;
+    font-size: 18px;
+    color: #888;
+    cursor: pointer;
+  }
+  .popup .close:hover {
+    color: #000;
+  }
+  
+  .popup label {
+    font-weight: 600;
+    margin-top: 10px;
+    display: block;
+  }
+  
+  .popup input {
+    width: 100%;
+    padding: 6px;
+    margin-top: 4px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .popup button {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: #58B19F;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+  }
+  .popup button:hover {
+    background-color: #2e86c1;
+  }
+  

@@ -30,35 +30,42 @@ function initDiagram(data) {
 
   //  Nœud stylisé
   myDiagram.nodeTemplate =
-    $(go.Node, "Auto",
+  $(go.Node, "Auto",
+    {
+      click: (e, obj) => showModal(obj.part.data),
+      cursor: "pointer"
+    },
+    $(go.Shape, "RoundedRectangle",
       {
-        click: (e, obj) => showModal(obj.part.data),
-        cursor: "pointer"
+        strokeWidth: 1,
+        stroke: "#888",
+        fill: "white"
       },
-      $(go.Shape, "RoundedRectangle",
+      new go.Binding("fill", "sector", getColorBySector)
+    ),
+    $(go.Panel, "Vertical",
+      { margin: 8 },
+      $(go.TextBlock,
         {
-          strokeWidth: 1,
-          stroke: "#888",
-          fill: "white"
+          font: "bold 14px 'Poppins', sans-serif",
+          stroke: "#333"
         },
-        new go.Binding("fill", "sector", getColorBySector)
-      ),
-      $(go.Panel, "Vertical",
-        { margin: 8 },
-        $(go.TextBlock,
-          {
-            font: "bold 14px 'Poppins', sans-serif",
-            stroke: "#333"
-          },
-          new go.Binding("text", "text")),
-        $(go.TextBlock,
-          {
-            font: "12px 'Poppins', sans-serif",
-            stroke: "#555"
-          },
-          new go.Binding("text", "role"))
+        new go.Binding("text", "text")),
+      $(go.TextBlock,
+        {
+          font: "12px 'Poppins', sans-serif",
+          stroke: "#555",
+          margin: new go.Margin(2, 0, 0, 0),
+          visible: false
+        },
+        new go.Binding("text", "role"),
+        new go.Binding("visible", "role", function(role) {
+          return role && role !== "Non défini";
+        })
       )
-    );
+    )
+  );
+
 
   myDiagram.linkTemplate =
     $(go.Link,
@@ -111,8 +118,42 @@ function showModal(data) {
     }));
 
     myDiagram.model.updateTargetBindings(data);
+
+    console.log("Données envoyées vers serveur :", {
+      id_acteur: data.key,
+      role_entreprise: data.role,
+      age: data.age,
+      secteur: data.sector,
+      extraFields: data.extraFields
+    });
+
+
+    // 🛠️ NOUVEAU : Envoi vers la BDD
+    fetch("../php/save_actor_fields.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id_acteur: data.key, // 🔥 très important : ici c'est "key" dans ton organigramme
+        role_entreprise: data.role,
+        age: data.age,
+        secteur: data.sector,
+        extraFields: data.extraFields
+      })
+    })
+    .then(res => res.json())
+    .then(result => {
+      if (!result.success) {
+        alert("Erreur lors de la sauvegarde : " + result.message);
+      }
+    })
+    .catch(err => {
+      console.error("Erreur lors de la sauvegarde :", err);
+      alert("Erreur serveur.");
+    });
+
     closeModal();
-  };
+};
+
 
   document.getElementById("add-field-btn").onclick = () => {
     const label = prompt("Nom du champ :");
@@ -202,7 +243,8 @@ fetch('../php/dashboard.php')
       role: p.role_entreprise || "Non défini",
       age: p.age || "Non précisé",
       sector: p.secteur || "Non précisé",
-      parent: p.id_acteur_superieur ? String(p.id_acteur_superieur) : undefined
+      parent: p.id_acteur_superieur ? String(p.id_acteur_superieur) : undefined,
+      extraFields: p.extra_fields || []
     }));
     initDiagram(formatted);
   })

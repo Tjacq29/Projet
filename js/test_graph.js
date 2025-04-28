@@ -121,7 +121,8 @@ function submitRelationDetails() {
 
   const edgeData = {
     ...tempEdgeData,
-    label,
+    label: label.length <= 15 ? label : "",
+    type_relation: label,
     direction: tempEdgeData.direction,
     impact_source_vers_cible: impactSrcCible,
     impact_cible_vers_source: impactCibleSrc,
@@ -247,10 +248,15 @@ document.addEventListener("DOMContentLoaded", () => {
       hierarchyElements.push({
         data: {
           id: nodeId,
-          label: a.prenom + ' ' + a.nom
+          label: a.prenom + ' ' + a.nom,
+          role_entreprise: a.role_entreprise || "Non défini",
+          age: a.age || "Non précisé",
+          secteur: a.secteur || "Non précisé",
+          extraFields: a.extra_fields || []// au cas où tu veux ajouter des champs personnalisés après
         }
       });
     });
+    
     console.log("relationsHierarchiques =", relationsHierarchiques);
 
     // Relations hiérarchiques
@@ -294,7 +300,8 @@ document.addEventListener("DOMContentLoaded", () => {
             uid: rel.uid,
             source: rel.from,
             target: rel.to,
-            label: rel.type_relation,
+            label: rel.type_relation.length <= 15 ? rel.type_relation : "",
+            type_relation: rel.type_relation,
             direction: rel.direction,
             impact_source_vers_cible: rel.impact_source_vers_cible,
             impact_cible_vers_source: rel.impact_cible_vers_source,
@@ -337,6 +344,42 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     setupMenu();
+
+    // ➡️ Ajouter les événements de survol (mouseover/mouseout) sur les flèches
+
+cy.on('mouseover', 'edge', (event) => {
+  const edge = event.target;
+
+  if (!edge.hasClass('hierarchie')) {
+    const content = `
+      <strong>Type :</strong> ${edge.data('type_relation') || "Non précisé"}<br>
+      <strong>Durée :</strong> ${edge.data('duree_relation') || "Non précisé"}<br>
+      <strong>Nature :</strong> ${edge.data('nature_relation') || "Neutre"}<br>
+    `;
+
+    const tooltip = document.createElement('div');
+    tooltip.id = 'tooltipEdge';
+    tooltip.innerHTML = content;
+    tooltip.style.position = 'fixed';
+    tooltip.style.top = (event.originalEvent.clientY + 10) + 'px';
+    tooltip.style.left = (event.originalEvent.clientX + 10) + 'px';
+    tooltip.style.background = '#fff';
+    tooltip.style.border = '1px solid #ccc';
+    tooltip.style.padding = '8px';
+    tooltip.style.boxShadow = '0px 0px 8px rgba(0,0,0,0.3)';
+    tooltip.style.zIndex = 10000;
+    tooltip.style.maxWidth = '250px';
+    tooltip.style.fontSize = '12px';
+    
+    document.body.appendChild(tooltip);
+  }
+});
+
+cy.on('mouseout', 'edge', (event) => {
+  const tooltip = document.getElementById('tooltipEdge');
+  if (tooltip) tooltip.remove();
+});
+
   })
   .catch(err => console.error("Erreur de chargement :", err));
 });
@@ -396,27 +439,32 @@ function setupMenu() {
 
   cy.on('tap', 'node', (e) => {
     const node = e.target;
+  
     if (selectedColor) {
       node.style('background-color', selectedColor);
       selectedColor = null;
       return;
     }
-    if (!selectedTool) return;
+  
+    if (!selectedTool) {
+      // ➡️ Aucun outil sélectionné : ouvrir la fiche acteur
+      showActorPopup(node);
+      return;
+    }
+  
     if (!tempFromNode) {
       tempFromNode = node;
     } 
-    else if (selectedTool== "Simple"){
-        
-    }
-    else {
+    else if (selectedTool === "Simple" || selectedTool === "Double") {
       const from = tempFromNode.id();
       const to = node.id();
       const direction = selectedTool === "double" ? "Double" : "Simple";
-      createRelationPopup(from, to, direction); // Montre le formulaire pop-up
+      createRelationPopup(from, to, direction);
       tempFromNode = null;
       selectedTool = null;
     }
   });
+  
 
   document.getElementById("saveGraphBtn").onclick = () => {
     const relationsToSave = [];
@@ -472,6 +520,7 @@ function setupMenu() {
   
 
 }
+
 
 function setupColorPanel() {
   const colors = [
@@ -600,4 +649,117 @@ function supprimerZoneContour() {
   }
 
   zone.remove();
+
+
+
+
 }
+
+document.getElementById("saveActorBtn").onclick = () => {
+  const nodeId = node.id().replace("act_", ""); // enlever "act_" pour avoir juste l'id
+
+  const role = document.getElementById("actorRole").value;
+  const age = document.getElementById("actorAge").value;
+  const secteur = document.getElementById("actorSector").value;
+
+  const customZone = document.getElementById("customFields");
+  const extraInputs = customZone.querySelectorAll("input[data-label]");
+  const extraFields = Array.from(extraInputs).map(input => ({
+    label: input.dataset.label,
+    value: input.value
+  }));
+
+  // Mise à jour dans cytoscape
+  node.data("role_entreprise", role);
+  node.data("age", age);
+  node.data("secteur", secteur);
+  node.data("extraFields", extraFields);
+
+  // ➡️ ENVOI AU SERVEUR
+  fetch("../php/save_actor_fields.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      id_acteur: nodeId,
+      role_entreprise: role,
+      age: age,
+      secteur: secteur,
+      extraFields: extraFields
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (!data.success) {
+      alert("Erreur lors de la sauvegarde: " + data.message);
+    }
+  })
+  .catch(error => {
+    console.error("Erreur:", error);
+    alert("Erreur serveur lors de la sauvegarde");
+  });
+
+  closeActorPopup();
+};
+
+
+function closeActorPopup() {
+  document.getElementById("actorPopup").style.display = "none";
+}
+function showActorPopup(node) {
+  const popup = document.getElementById("actorPopup");
+
+  // Remplir les données
+  document.getElementById("actorName").innerText = node.data("label") || "";
+  document.getElementById("actorRole").value = node.data("role_entreprise") || "";
+  document.getElementById("actorAge").value = node.data("age") || "";
+  document.getElementById("actorSector").value = node.data("secteur") || "";
+
+  const customZone = document.getElementById("customFields");
+  customZone.innerHTML = "";
+  (node.data("extraFields") || []).forEach(({ label, value }) => {
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <label>${label}</label>
+      <input type="text" data-label="${label}" value="${value}">
+    `;
+    customZone.appendChild(div);
+  });
+
+  // Positionner le popup
+  const pos = node.renderedPosition();
+  popup.style.left = (pos.x + 30) + "px";
+  popup.style.top = (pos.y - 30) + "px";
+  popup.style.transform = "none"; // ❗ Important
+  popup.style.display = "block";
+
+  document.getElementById("saveActorBtn").onclick = () => {
+    node.data("role_entreprise", document.getElementById("actorRole").value);
+    node.data("age", document.getElementById("actorAge").value);
+    node.data("secteur", document.getElementById("actorSector").value);
+
+    const extraInputs = customZone.querySelectorAll("input[data-label]");
+    node.data("extraFields", Array.from(extraInputs).map(input => ({
+      label: input.dataset.label,
+      value: input.value
+    })));
+
+    closeActorPopup();
+  };
+
+  document.getElementById("addCustomFieldBtn").onclick = () => {
+    const label = prompt("Nom du champ personnalisé :");
+    if (label) {
+      const div = document.createElement("div");
+      div.innerHTML = `
+        <label>${label}</label>
+        <input type="text" data-label="${label}">
+      `;
+      customZone.appendChild(div);
+    }
+  };
+}
+
+function closeActorPopup() {
+  document.getElementById("actorPopup").style.display = "none";
+}
+
