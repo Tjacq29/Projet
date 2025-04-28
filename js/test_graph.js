@@ -70,7 +70,7 @@ function createRelationPopup(fromId, toId, direction) {
   lastTo = toId;
 
   tempEdgeData = {
-    id: fromId + "-" + toId + "-" + Date.now(),
+    id: "rel_" + Date.now(),
     source: fromId,
     target: toId,
     direction
@@ -345,7 +345,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setupMenu();
 
-    // ➡️ Ajouter les événements de survol (mouseover/mouseout) sur les flèches
+// ➡️ Affichage fiche acteur au survol
+cy.on('mouseover', 'node', (event) => {
+  const node = event.target;
+  if (node.data('isZone')) return; // 🔥 Ignore si c'est une zone
+  
+  const content = `
+    <strong>${node.data('label') || ''}</strong><br>
+    <strong>Rôle:</strong> ${node.data('role_entreprise') || "Non précisé"}<br>
+    <strong>Âge:</strong> ${node.data('age') || "Non précisé"}<br>
+    <strong>Secteur:</strong> ${node.data('secteur') || "Non précisé"}<br>
+    ${Array.isArray(node.data('extraFields')) ? node.data('extraFields').map(f => `<strong>${f.label}:</strong> ${f.value}<br>`).join('') : ''}
+  `;
+
+  const tooltip = document.createElement('div');
+  tooltip.id = 'tooltipNode';
+  tooltip.innerHTML = content;
+  tooltip.style.position = 'fixed';
+  tooltip.style.top = (event.originalEvent.clientY + 10) + 'px';
+  tooltip.style.left = (event.originalEvent.clientX + 10) + 'px';
+  tooltip.style.background = '#fff';
+  tooltip.style.border = '1px solid #ccc';
+  tooltip.style.padding = '8px';
+  tooltip.style.boxShadow = '0px 0px 8px rgba(0,0,0,0.3)';
+  tooltip.style.zIndex = 10000;
+  tooltip.style.maxWidth = '250px';
+  tooltip.style.fontSize = '12px';
+
+  document.body.appendChild(tooltip);
+});
+
+//Cacher la fiche au mouseout
+cy.on('mouseout', 'node', () => {
+  const tooltip = document.getElementById('tooltipNode');
+  if (tooltip) tooltip.remove();
+});
+
 
 cy.on('mouseover', 'edge', (event) => {
   const edge = event.target;
@@ -446,24 +481,27 @@ function setupMenu() {
       return;
     }
   
-    if (!selectedTool) {
-      // ➡️ Aucun outil sélectionné : ouvrir la fiche acteur
-      showActorPopup(node);
-      return;
-    }
+    if (!selectedTool) return; // 🔥 PAS d'outil sélectionné => on ne fait rien (PAS de showActorPopup ici !)
   
     if (!tempFromNode) {
-      tempFromNode = node;
-    } 
-    else if (selectedTool === "Simple" || selectedTool === "Double") {
+      tempFromNode = node; // 🔥 Premier clic => mémorise FROM
+    } else {
       const from = tempFromNode.id();
       const to = node.id();
+      if (from === to) {
+        alert("Vous ne pouvez pas relier un acteur à lui-même.");
+        tempFromNode = null;
+        selectedTool = null;
+        return;
+      }
+  
       const direction = selectedTool === "double" ? "Double" : "Simple";
-      createRelationPopup(from, to, direction);
+      createRelationPopup(from, to, direction); // 🔥 On ouvre directement le formulaire
       tempFromNode = null;
       selectedTool = null;
     }
   });
+  
   
 
   document.getElementById("saveGraphBtn").onclick = () => {
@@ -516,7 +554,7 @@ function setupMenu() {
   
 
   setupColorPanel();
-  // ➕ EMOJI SUR RELATION
+  
   
 
 }
@@ -551,7 +589,7 @@ function setupColorPanel() {
 function creerZoneContour(type = "alliance") {
   const selectedNodes = cy.nodes(":selected");
 
-  // 🔥 Filtrer uniquement les acteurs normaux (PAS les zones)
+  // Filtrer uniquement les acteurs normaux (PAS les zones)
   const actorsOnly = selectedNodes.filter(node => 
     !node.hasClass('zoneContour') && !node.data('isZone')
   );
@@ -655,111 +693,5 @@ function supprimerZoneContour() {
 
 }
 
-document.getElementById("saveActorBtn").onclick = () => {
-  const nodeId = node.id().replace("act_", ""); // enlever "act_" pour avoir juste l'id
 
-  const role = document.getElementById("actorRole").value;
-  const age = document.getElementById("actorAge").value;
-  const secteur = document.getElementById("actorSector").value;
-
-  const customZone = document.getElementById("customFields");
-  const extraInputs = customZone.querySelectorAll("input[data-label]");
-  const extraFields = Array.from(extraInputs).map(input => ({
-    label: input.dataset.label,
-    value: input.value
-  }));
-
-  // Mise à jour dans cytoscape
-  node.data("role_entreprise", role);
-  node.data("age", age);
-  node.data("secteur", secteur);
-  node.data("extraFields", extraFields);
-
-  // ➡️ ENVOI AU SERVEUR
-  fetch("../php/save_actor_fields.php", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      id_acteur: nodeId,
-      role_entreprise: role,
-      age: age,
-      secteur: secteur,
-      extraFields: extraFields
-    })
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (!data.success) {
-      alert("Erreur lors de la sauvegarde: " + data.message);
-    }
-  })
-  .catch(error => {
-    console.error("Erreur:", error);
-    alert("Erreur serveur lors de la sauvegarde");
-  });
-
-  closeActorPopup();
-};
-
-
-function closeActorPopup() {
-  document.getElementById("actorPopup").style.display = "none";
-}
-function showActorPopup(node) {
-  const popup = document.getElementById("actorPopup");
-
-  // Remplir les données
-  document.getElementById("actorName").innerText = node.data("label") || "";
-  document.getElementById("actorRole").value = node.data("role_entreprise") || "";
-  document.getElementById("actorAge").value = node.data("age") || "";
-  document.getElementById("actorSector").value = node.data("secteur") || "";
-
-  const customZone = document.getElementById("customFields");
-  customZone.innerHTML = "";
-  (node.data("extraFields") || []).forEach(({ label, value }) => {
-    const div = document.createElement("div");
-    div.innerHTML = `
-      <label>${label}</label>
-      <input type="text" data-label="${label}" value="${value}">
-    `;
-    customZone.appendChild(div);
-  });
-
-  // Positionner le popup
-  const pos = node.renderedPosition();
-  popup.style.left = (pos.x + 30) + "px";
-  popup.style.top = (pos.y - 30) + "px";
-  popup.style.transform = "none"; // ❗ Important
-  popup.style.display = "block";
-
-  document.getElementById("saveActorBtn").onclick = () => {
-    node.data("role_entreprise", document.getElementById("actorRole").value);
-    node.data("age", document.getElementById("actorAge").value);
-    node.data("secteur", document.getElementById("actorSector").value);
-
-    const extraInputs = customZone.querySelectorAll("input[data-label]");
-    node.data("extraFields", Array.from(extraInputs).map(input => ({
-      label: input.dataset.label,
-      value: input.value
-    })));
-
-    closeActorPopup();
-  };
-
-  document.getElementById("addCustomFieldBtn").onclick = () => {
-    const label = prompt("Nom du champ personnalisé :");
-    if (label) {
-      const div = document.createElement("div");
-      div.innerHTML = `
-        <label>${label}</label>
-        <input type="text" data-label="${label}">
-      `;
-      customZone.appendChild(div);
-    }
-  };
-}
-
-function closeActorPopup() {
-  document.getElementById("actorPopup").style.display = "none";
-}
 
