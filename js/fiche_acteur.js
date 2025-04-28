@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
         </tr>`;
         tbody.insertAdjacentHTML("beforeend", row);
       
-      }); // ← fin du forEach
+      }); 
     }
 
   });

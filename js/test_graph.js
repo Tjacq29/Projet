@@ -33,7 +33,7 @@ function getPopupFormHTML(direction) {
       <label>Impact Source → Cible :</label>
       <select id="popupImpactSrcCible" style="width:100%">
         <option value="Faible">Faible</option>
-        <option value="Moyen" selected>Moyen</option>
+        <option value="Moyen" selected>Neutre</option>
         <option value="Fort">Fort</option>
       </select><br><br>
 
@@ -41,7 +41,7 @@ function getPopupFormHTML(direction) {
       <label>Impact Cible → Source :</label>
       <select id="popupImpactCibleSrc" style="width:100%">
         <option value="Faible">Faible</option>
-        <option value="Moyen" selected>Moyen</option>
+        <option value="Moyen" selected>Neutre</option>
         <option value="Fort">Fort</option>
       </select><br><br>` : ''}
 
@@ -52,8 +52,9 @@ function getPopupFormHTML(direction) {
         <option value="Neutre" selected>Neutre</option>
       </select><br><br>
 
-      <label>Durée (mois) :</label>
-      <input type="number" id="popupDuree" min="0" value="0" style="width:100%"><br><br>
+      <label>Durée :</label>
+      <input type="text" id="popupDuree" placeholder="ex: 12 mois ou Relation longue" style="width:100%"><br><br>
+
 
       <button onclick="submitRelationDetails()">Valider</button>
       <button onclick="cancelRelation()">Annuler</button>
@@ -103,14 +104,14 @@ function getLineStyleByImpact(impact) {
 }
 
 function submitRelationDetails() {
-  const label = document.getElementById("popupType").value || "Relation";
+  const label = document.getElementById("popupType").value.trim();
   const impactSrcCible = document.getElementById("popupImpactSrcCible").value;
   const impactCibleSrc = document.getElementById("popupImpactCibleSrc")
     ? document.getElementById("popupImpactCibleSrc").value
     : null;
 
   const nature = document.getElementById("popupNature").value;
-  const duree = parseInt(document.getElementById("popupDuree").value) || 0;
+  const duree = document.getElementById("popupDuree").value.trim();
 
   const color = getColorByNature(nature);
   const styleSrc = getLineStyleByImpact(impactSrcCible);
@@ -146,7 +147,8 @@ function submitRelationDetails() {
         ...edgeData,
         id: edgeData.target + "-" + edgeData.source + "-" + Date.now(),
         source: edgeData.target,
-        target: edgeData.source
+        target: edgeData.source,
+        label:""
       }
     });
 
@@ -154,7 +156,8 @@ function submitRelationDetails() {
       'line-color': color,
       'target-arrow-color': color,
       'width': styleCible.width,
-      'line-style': styleCible.style
+      'line-style': styleCible.style,
+      'curve-style': 'bezier',
     });
   }
 
@@ -238,7 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const hierarchyElements = [];
     const informelleElements = [];
 
-    // Ajout des acteurs (noeuds)
+    // Ajout des act
     acteurs.forEach(a => {
       const nodeId = 'act_' + a.id_acteur;
       hierarchyElements.push({
@@ -263,10 +266,10 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // ➕ Ajoute la hiérarchie uniquement
+    //  On ajoute juste la hiérarchie 
     cy.add(hierarchyElements);
 
-    // ➕ Applique le layout hiérarchique uniquement sur les relations hiérarchiques
+    //  On applique le layout que sur les relations hiérarchiques pour éviter pbm précédent de recalcul des positions
     cy.layout({
       name: 'breadthfirst',
       directed: true,
@@ -313,7 +316,7 @@ document.addEventListener("DOMContentLoaded", () => {
               uid: rel.uid,
               source: rel.to,
               target: rel.from,
-              label: rel.type_relation,
+              label: " ",
               direction: rel.direction,
               impact_source_vers_cible: rel.impact_cible_vers_source,
               impact_cible_vers_source: rel.impact_source_vers_cible,
@@ -364,11 +367,11 @@ function setupMenu() {
         if (el.isEdge() && !el.hasClass("hierarchie")) {
           const uid = el.data("uid");
   
-          // 🔒 Vérifie si cette relation a déjà été marquée pour suppression
+          //  Vérifie si cette relation a déjà été marquée pour suppression
           if (uid && !deletedRelationIds.includes(uid)) {
             deletedRelationIds.push(uid);
   
-            // 🧠 Si c'est une relation double (flèche aller + retour),
+            // Si c'est une relation double (flèche aller + retour),
             // alors on doit supprimer aussi la flèche inverse visuelle
             const direction = el.data("direction");
             if (direction === "Double") {
@@ -376,13 +379,13 @@ function setupMenu() {
                 e.data("uid") === uid &&
                 e.id() !== el.id() // on ne supprime pas deux fois le même edge
               );
-              reverse.remove(); // ❌ supprime la flèche visuelle miroir
+              reverse.remove(); // supprime la flèche visuelle miroir
             }
           }
         }
       });
   
-      // ❌ Enfin, supprime la flèche sélectionnée
+      // Enfin, supprime la flèche sélectionnée
       selected.remove();
     }
   };
@@ -471,8 +474,18 @@ function setupMenu() {
 }
 
 function setupColorPanel() {
-  const colors = ["#58B19F", "#f8c291", "#82ccdd", "#f6b93b", "#F97F51", "#a29bfe", "#ff7675"];
+  const colors = [
+    "#bdc3c7", // gris clair - acteurs discrets
+    "#58B19F", // vert eau
+    "#f8c291", // pêche clair
+    "#82ccdd", // bleu ciel
+    "#f6b93b", // jaune vif
+    "#F97F51", // orange doux
+    "#a29bfe", // violet pastel
+    "#ff7675"  // rouge rosé
+  ];
   const panel = document.getElementById("colorPanel");
+  panel.innerHTML = ""; // vide le panneau
   colors.forEach(color => {
     const btn = document.createElement("button");
     btn.className = "color-choice";
@@ -485,34 +498,60 @@ function setupColorPanel() {
   });
 }
 
+
 function creerZoneContour(type = "alliance") {
   const selectedNodes = cy.nodes(":selected");
 
-  if (selectedNodes.length < 2) {
+  // 🔥 Filtrer uniquement les acteurs normaux (PAS les zones)
+  const actorsOnly = selectedNodes.filter(node => 
+    !node.hasClass('zoneContour') && !node.data('isZone')
+  );
+
+  if (actorsOnly.length < 2) {
     alert("Sélectionne au moins deux acteurs pour créer une zone.");
     return;
   }
 
+  const boundingBox = actorsOnly.boundingBox();
   const idZone = "zone_" + Date.now();
   const couleur = type === "tension" ? "#e74c3c" : "#2ecc71";
-  const etiquette = type === "tension" ? " TENSION - - -" : " ALLIANCE + + +";
+  const etiquette = type === "tension" ? "TENSION - - -" : "ALLIANCE + + +";
 
-  // Ajouter le compound node
   cy.add({
     group: 'nodes',
-    data: { id: idZone, label: etiquette },
-    classes: 'zoneContour',
-    position: { x: 0, y: 0 } // inutile, auto-géré
+    data: {
+      id: idZone,
+      label: etiquette,
+      isZone: true
+    },
+    position: {
+      x: (boundingBox.x1 + boundingBox.x2) / 2,
+      y: (boundingBox.y1 + boundingBox.y2) / 2
+    },
+    selectable: true,    // ✅ on peut cliquer
+    grabbable: true,     // ✅ on peut déplacer
+    locked: false        // ✅ libre
   });
 
-  // Définir comme parent des noeuds sélectionnés
-  selectedNodes.forEach(node => {
-    node.move({ parent: idZone });
+  cy.$id(idZone).style({
+    'shape': 'roundrectangle',
+    'width': boundingBox.w + 80,
+    'height': boundingBox.h + 80,
+    'background-opacity': 0,
+    'border-width': 3,
+    'border-color': couleur,
+    'border-style': 'dashed',
+    'label': etiquette,
+    'text-valign': 'top',
+    'text-halign': 'center',
+    'font-size': 14,
+    'color': '#444',
+    'z-compound-depth': 'bottom' // 🔥 reste en arrière plan
   });
-
-  // Appliquer la couleur de bordure
-  cy.$id(idZone).style({ 'border-color': couleur });
 }
+
+
+
 
 
 document.getElementById("submitToProfBtn").onclick = () => {
@@ -553,18 +592,12 @@ document.getElementById("submitToProfBtn").onclick = () => {
 
 function supprimerZoneContour() {
   const selected = cy.nodes(":selected");
-  const zone = selected.filter(n => n.hasClass("zoneContour"));
+  const zone = selected.filter(n => n.data('isZone') === true); // 🎯 Cible uniquement les vraies zones
 
   if (zone.length === 0) {
-    alert("Sélectionne une zone (bordure) à supprimer.");
+    alert("Sélectionne une zone à supprimer (clic sur le bord d'une zone).");
     return;
   }
 
-  const zoneId = zone[0].id();
-
-  // Détacher les enfants
-  cy.nodes(`[parent = "${zoneId}"]`).move({ parent: null });
-
-  // Supprimer la zone
   zone.remove();
 }

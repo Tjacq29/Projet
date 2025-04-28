@@ -10,7 +10,7 @@ if (!isset($_SESSION["id_utilisateur"])) {
 $id_utilisateur = $_SESSION["id_utilisateur"];
 
 try {
-    // On récupère tous les acteurs créés par l'utilisateur
+    // On récup tous les acteurs créés par l'utilisateur
     $sql = "SELECT id_acteur, nom, prenom FROM acteur WHERE id_utilisateur = :id_utilisateur";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(["id_utilisateur" => $id_utilisateur]);

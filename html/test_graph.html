@@ -23,6 +23,16 @@
     </div>
 </div>
 
+<!-- MENU DÉROULANT -->
+<div id="menuDialog" class="custom-dialog">
+  <a href="../html/index.html">Accueil</a>
+  <a href="../html/dashboard.html">Tableau</a>
+  <a href="../html/organigramme.html">Organigramme</a>
+  <a href="../html/about.html">À propos</a>
+  <a href="../html/course.html">Sociologie des organisations</a>
+  <a href="../html/admin_view.html">Visualisation du graphique des élèves</a>
+</div>
+
 <header class="graph-intro">
   <h1>Création du Graphe Informel</h1>
   <p>Visualisez et saisissez les relations informelles entre les acteurs</p>
@@ -31,9 +41,9 @@
   
 <div class="container">
   <div class="panel">
-    <button id="linkSimpleBtn">→ Flèche simple</button>
-    <button id="linkDoubleBtn">↔ Flèche double sens</button>
-    <button id="deleteSelectedBtn">Supprimer sélection</button>
+    <button id="linkSimpleBtn" class="main-button">→ Flèche simple</button>
+    <button id="linkDoubleBtn" class="main-button">↔ Flèche double sens</button>
+    <button id="deleteSelectedBtn" class="main-button">Supprimer sélection</button>
 
     <label>Couleur des acteurs selon leurs secteurs:</label>
     <div id="colorPanel"></div>
@@ -41,8 +51,8 @@
     <hr>
     <h4>Zones d'ambiance</h4>
     <div style="display:flex;gap: 10px;margin-top: 8px;">
-      <button onclick="creerZoneContour('alliance')">Créer Zone Alliance +++</button>
-    <button onclick="creerZoneContour('tension')">Créer Zone Tension ---</button>
+      <button class="main-button" onclick="creerZoneContour('alliance')">Créer Zone Alliance +++</button>
+    <button class="main-button" onclick="creerZoneContour('tension')">Créer Zone Tension ---</button>
     </div>
     
     <button onclick="supprimerZoneContour()">🗑️ Supprimer une zone sélectionnée</button>
@@ -53,12 +63,12 @@
     <hr>
     <h4>Enregistrement / Envoi du graphique</h4>
     <div style="display: flex; gap: 10px; margin-top: 8px;">
-      <button id="saveGraphBtn" style="flex: 1;">Enregistrer</button>
-      <button id="submitToProfBtn" style="flex: 1; background-color: #28a745;">Envoyer au Prof</button>
+      <button id="saveGraphBtn" class="main-button" style="flex: 1;">Enregistrer</button>
+      <button id="submitToProfBtn" class="main-button" style="flex: 1; background-color: #28a745;">Envoyer au Prof</button>
     </div>
     <hr>
     <h4>Fiche acteur</h4>
-    <button class="btn" onclick="window.location.href='../html/fiche_acteur.html'" style="margin-top: 10px; background-color: #6c757d;">Fiche récapitulative des relations informelles par acteur </button>
+    <button class="main-button" onclick="window.location.href='../html/fiche_acteur.html'" style="margin-top: 10px; background-color: #6c757d;">Fiche récapitulative</button>
    
     <hr>
     <h4 style="cursor: pointer;" onclick="toggleInstructions()">📘 Mode d’emploi ▼</h4>
