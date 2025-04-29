@@ -128,12 +128,12 @@ function showModal(data) {
     });
 
 
-    // 🛠️ NOUVEAU : Envoi vers la BDD
+    // Envoi vers la BDD
     fetch("../php/save_actor_fields.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        id_acteur: data.key, // 🔥 très important : ici c'est "key" dans ton organigramme
+        id_acteur: data.key, //  key dans l'organigramme
         role_entreprise: data.role,
         age: data.age,
         secteur: data.sector,
@@ -180,7 +180,7 @@ function closeModal() {
 }
 
 function saveGraph() {
-  console.log("💾 saveGraph() appelée !");
+  console.log(" saveGraph() appelée !");
   const userId = sessionStorage.getItem("userId");
   if (!userId) {
     alert("Non connecté !");
@@ -263,14 +263,14 @@ if (myDiagram) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("✅ JS chargé et DOM prêt");
+  console.log(" JS charg");
 
   const saveBtn = document.getElementById("saveGraphBtn");
   if (saveBtn) {
-    console.log("✅ Bouton trouvé, ajout de l'action");
+    console.log(" Bouton trouvé, ajout de l'action");
     saveBtn.onclick = saveGraph;
   } else {
-    console.log("❌ Bouton NON trouvé !");
+    console.log(" Bouton NON trouvé !");
   }
 });
 

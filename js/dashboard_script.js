@@ -15,11 +15,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: formData,
                 credentials: "include"
             })
-            .then(response => response.text()) // ← pour lire le texte brut
+            .then(response => response.text()) 
             .then(text => {
-                console.log("Réponse brute du serveur :", text); //  Affiche ce que PHP renvoie vraiment
+                console.log("Réponse brute du serveur :", text); //  Affiche PHP reel
             
-                // Essaie de parser le JSON seulement si tu vois qu'il est correct
+               
                 const data = JSON.parse(text);
                 alert(data.message);
                 if (data.success) {
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function loadActeurs() {
     fetch("../php/dashboard.php", {
-        credentials: "include" //  Important
+        credentials: "include" 
     })
         .then(response => response.json())
         .then(data => {

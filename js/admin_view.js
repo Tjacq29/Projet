@@ -11,7 +11,7 @@ fetch('../php/get_saved_graph.php')
     data.schemas.forEach(schema => {
       const tr = document.createElement("tr");
 
-      // Génération du lien image (si nom_fichier défini)
+      // Génération du lien img
       const imagePreview = schema.nom_fichier
         ? `<img src="../schemas/img/${schema.nom_fichier}" style="max-width: 150px; display:block; margin-bottom:5px;" />`
         : "—";

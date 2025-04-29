@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // --- Connexion / Déconnexion ---
+    // Co/Déco
     const authContainer = document.getElementById("authButtons");
     const userId = sessionStorage.getItem("userId");
     const prenom = sessionStorage.getItem("prenom") || "Utilisateur";
@@ -34,12 +34,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --- Menu déroulant personnalisé ---
+    //Menu déroulant
     const openMenu = document.getElementById("openMenu");
     const menuDialog = document.getElementById("menuDialog");
 
     if (openMenu && menuDialog) {
-        // Toggle menu on click
+        // Toggle menu si on click
         openMenu.addEventListener("click", (e) => {
             e.stopPropagation();
             menuDialog.classList.toggle("show");

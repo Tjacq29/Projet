@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const nomTitre = document.getElementById("acteurNom");
     let radarChartInstance = null;
 
-    // Charger la liste des acteurs au chargement
+    // Charger la liste des acts au chargement
     fetch('../php/get_acteurs_utilisateur.php')
       .then(res => res.json())
       .then(data => {
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
           // Radar avec les i,fos de l'act
           afficherRadar(acteur.radar);
   
-          // Charger les détails relationnels
+          // Charger les détails des relations
           fetch(`../php/fiche_relation_details.php?id_acteur=${idActeur}`)
             .then(res => res.json())
             .then(data => afficherRelations(data));
@@ -48,20 +48,20 @@ document.addEventListener("DOMContentLoaded", function () {
       const mainDataset = {
         label: 'Zone de relations',
         data: radar.data,
-        backgroundColor: 'rgba(100, 100, 100, 0.1)', //  fond neutre
+        backgroundColor: 'rgba(100, 100, 100, 0.1)', 
         borderColor: 'rgba(120, 120, 120, 0.2)', 
         borderWidth: 1,
         pointRadius: 0,
         fill: true
       };
     
-      // Datasets individuels pour les couleurs personnalisées par axe
+      // Datasets indiv pour les couleurs personnalisées par axe
       const colorDatasets = radar.labels.map((label, i) => {
         const data = radar.labels.map((_, j) => j === i ? radar.data[i] : 0);
         return {
           label: label,
           data: data,
-          backgroundColor: 'rgba(0,0,0,0)', // pas de fond
+          backgroundColor: 'rgba(0,0,0,0)', // on enleve le fond
           borderColor: radar.colors[i],
           borderWidth: 2,
           pointBackgroundColor: radar.colors[i],
