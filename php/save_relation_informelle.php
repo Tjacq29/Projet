@@ -25,7 +25,6 @@ try {
     $inserted = 0;
     $deleted = 0;
 
-    // Suppression des relations
     if (!empty($toDelete)) {
         $stmtDelete = $pdo->prepare("DELETE FROM relation_informelle WHERE id_relation_informelle = ? AND id_utilisateur = ?");
         foreach ($toDelete as $uid) {
@@ -34,7 +33,6 @@ try {
         }
     }
 
-    // Préparation requêtes
     $stmtInsert = $pdo->prepare("
         INSERT INTO relation_informelle (
             id_acteur_source, id_acteur_cible, type_relation,
