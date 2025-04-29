@@ -6,7 +6,7 @@ header("Content-Type: application/json");
 session_start();
 require_once 'config.php';
 
-if (!isset($_SESSION['id_utilisateur'])) {
+if (!isset($_SESSION['id_utilisateur'])) { // verif util bien co à mettre partout
     echo json_encode([]);
     exit();
 }
