@@ -1,4 +1,3 @@
-/* ---- GLOBAL ---- */
 * {
     margin: 0;
     padding: 0;
@@ -6,7 +5,6 @@
     font-family: "Montserrat", sans-serif;
 }
 
-/* ---- BODY ---- */
 body {
     display: flex;
     flex-direction: column;
@@ -20,7 +18,6 @@ body {
     background-attachment: fixed;
 }
 
-/* ---- CONTAINER ---- */
 .container {
     background: rgba(27, 32, 48, 0.95);
     padding: 40px;
@@ -34,7 +31,6 @@ body {
     margin-top: 20px;
 }
 
-/* ---- TITRE ---- */
 h2 {
     text-align: center;
     color: #71aff6;
@@ -45,7 +41,6 @@ h2 {
     letter-spacing: 1px;
 }
 
-/* ---- FORMULAIRE ---- */
 .form-label {
     font-size: 16px;
     font-weight: bold;
@@ -55,7 +50,6 @@ h2 {
     margin-bottom: 5px;
 }
 
-/* ---- CHAMPS DU FORMULAIRE ---- */
 .form-control {
     width: 100%;
     padding: 12px;
@@ -73,7 +67,6 @@ h2 {
     box-shadow: 0 0 10px rgba(113, 175, 246, 0.8);
 }
 
-/* ---- BOUTON AJOUTER ---- */
 .btn {
     width: 100%;
     padding: 12px;
@@ -86,12 +79,10 @@ h2 {
     cursor: pointer;
 }
 
-/* ---- BOUTON PRINCIPAL ---- */
-/* ---- ESPACEMENT DU BOUTON ---- */
 .btn-primary {
     background: #71aff6;
     color: white;
-    margin-top: 15px; /* Ajout d'une marge pour espacer du champ au-dessus */
+    margin-top: 15px; 
     padding: 12px;
     font-size: 16px;
     font-weight: bold;

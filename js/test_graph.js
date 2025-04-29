@@ -87,9 +87,9 @@ function cancelRelation() {
 
 function getColorByNature(nature) {
   switch (nature) {
-    case 'Positive': return '#2ecc71'; // vert
-    case 'Négative': return '#e74c3c'; // rouge
-    case 'Neutre': return '#95a5a6'; // gris
+    case 'Positive': return '#2ecc71'; 
+    case 'Négative': return '#e74c3c'; 
+    case 'Neutre': return '#95a5a6'; 
     default: return '#999';
   }
 }
@@ -117,7 +117,7 @@ function submitRelationDetails() {
   const styleSrc = getLineStyleByImpact(impactSrcCible);
   const styleCible = getLineStyleByImpact(impactCibleSrc);
 
-  const uid = Date.now(); // uid temporaire côté client (sera ignoré si non utilisé)
+  const uid = Date.now(); 
 
   const edgeData = {
     ...tempEdgeData,
@@ -131,7 +131,6 @@ function submitRelationDetails() {
     uid: uid
   };
 
-  // Flèche principale
   const edge = cy.add({ group: 'edges', data: edgeData });
   edge.style({
     'line-color': color,
@@ -140,7 +139,6 @@ function submitRelationDetails() {
     'line-style': styleSrc.style
   });
 
-  // Si double, ajouter la flèche miroir (sans uid pour éviter double suppression)
   if (tempEdgeData.direction === "Double") {
     const reverseEdge = cy.add({
       group: 'edges',
@@ -162,7 +160,7 @@ function submitRelationDetails() {
     });
   }
 
-  cancelRelation(); // Ferme le formulaire
+  cancelRelation(); 
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -242,7 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const hierarchyElements = [];
     const informelleElements = [];
 
-    // Ajout des act
+    // Ajout des acterus
     acteurs.forEach(a => {
       const nodeId = 'act_' + a.id_acteur;
       hierarchyElements.push({
@@ -252,7 +250,7 @@ document.addEventListener("DOMContentLoaded", () => {
           role_entreprise: a.role_entreprise || "Non défini",
           age: a.age || "Non précisé",
           secteur: a.secteur || "Non précisé",
-          extraFields: a.extra_fields || []// au cas où tu veux ajouter des champs personnalisés après
+          extraFields: a.extra_fields || []
         }
       });
     });
@@ -272,10 +270,8 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    //  On ajoute juste la hiérarchie 
     cy.add(hierarchyElements);
 
-    //  On applique le layout que sur les relations hiérarchiques pour éviter pbm précédent de recalcul des positions
     cy.layout({
       name: 'breadthfirst',
       directed: true,
@@ -287,7 +283,6 @@ document.addEventListener("DOMContentLoaded", () => {
       orientation: 'vertical'
     }).run();
 
-    // Relations informelles ensuite (sans relayout)
     if (Array.isArray(relationsInformelles)) {
       relationsInformelles.forEach(rel => {
         const color = getColorByNature(rel.nature_relation);
@@ -340,15 +335,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
 
-      cy.add(informelleElements); // Ajout sans relancer le layout
+      cy.add(informelleElements); 
     }
 
     setupMenu();
 
-// ➡️ Affichage fiche acteur au survol
+//  Affichage fiche acteur au survol
 cy.on('mouseover', 'node', (event) => {
   const node = event.target;
-  if (node.data('isZone')) return; // 🔥 Ignore si c'est une zone
+  if (node.data('isZone')) return; 
   
   const content = `
     <strong>${node.data('label') || ''}</strong><br>
@@ -445,25 +440,21 @@ function setupMenu() {
         if (el.isEdge() && !el.hasClass("hierarchie")) {
           const uid = el.data("uid");
   
-          //  Vérifie si cette relation a déjà été marquée pour suppression
           if (uid && !deletedRelationIds.includes(uid)) {
             deletedRelationIds.push(uid);
   
-            // Si c'est une relation double (flèche aller + retour),
-            // alors on doit supprimer aussi la flèche inverse visuelle
             const direction = el.data("direction");
             if (direction === "Double") {
               const reverse = cy.edges().filter(e =>
                 e.data("uid") === uid &&
-                e.id() !== el.id() // on ne supprime pas deux fois le même edge
+                e.id() !== el.id() 
               );
-              reverse.remove(); // supprime la flèche visuelle miroir
+              reverse.remove(); 
             }
           }
         }
       });
   
-      // Enfin, supprime la flèche sélectionnée
       selected.remove();
     }
   };
@@ -481,10 +472,10 @@ function setupMenu() {
       return;
     }
   
-    if (!selectedTool) return; // 🔥 PAS d'outil sélectionné => on ne fait rien (PAS de showActorPopup ici !)
+    if (!selectedTool) return; 
   
     if (!tempFromNode) {
-      tempFromNode = node; // 🔥 Premier clic => mémorise FROM
+      tempFromNode = node; 
     } else {
       const from = tempFromNode.id();
       const to = node.id();
@@ -496,7 +487,7 @@ function setupMenu() {
       }
   
       const direction = selectedTool === "double" ? "Double" : "Simple";
-      createRelationPopup(from, to, direction); // 🔥 On ouvre directement le formulaire
+      createRelationPopup(from, to, direction); 
       tempFromNode = null;
       selectedTool = null;
     }
@@ -533,11 +524,11 @@ function setupMenu() {
         toDelete: deletedRelationIds
       })
     })
-    .then(res => res.text()) // récupère en texte brut
+    .then(res => res.text()) 
     .then(text => {
-      console.log("Réponse brute du serveur :", text); // 🔍 tu verras l'erreur ici
+      console.log("Réponse brute du serveur :", text); 
 
-      const response = JSON.parse(text); // tu le parses à la main
+      const response = JSON.parse(text); 
       alert(response.success
         ? ` ${response.relations_inserted} relation(s) enregistrée(s).`
         : ` Erreur : ${response.error || 'inconnue'}`);
@@ -562,17 +553,17 @@ function setupMenu() {
 
 function setupColorPanel() {
   const colors = [
-    "#bdc3c7", // gris clair - acteurs discrets
-    "#58B19F", // vert eau
-    "#f8c291", // pêche clair
-    "#82ccdd", // bleu ciel
-    "#f6b93b", // jaune vif
-    "#F97F51", // orange doux
-    "#a29bfe", // violet pastel
-    "#ff7675"  // rouge rosé
+    "#bdc3c7", 
+    "#58B19F", 
+    "#f8c291", 
+    "#82ccdd", 
+    "#f6b93b", 
+    "#F97F51",
+    "#a29bfe", 
+    "#ff7675" 
   ];
   const panel = document.getElementById("colorPanel");
-  panel.innerHTML = ""; // vide le panneau
+  panel.innerHTML = ""; 
   colors.forEach(color => {
     const btn = document.createElement("button");
     btn.className = "color-choice";
@@ -589,7 +580,6 @@ function setupColorPanel() {
 function creerZoneContour(type = "alliance") {
   const selectedNodes = cy.nodes(":selected");
 
-  // Filtrer uniquement les acteurs normaux (PAS les zones)
   const actorsOnly = selectedNodes.filter(node => 
     !node.hasClass('zoneContour') && !node.data('isZone')
   );
@@ -615,9 +605,9 @@ function creerZoneContour(type = "alliance") {
       x: (boundingBox.x1 + boundingBox.x2) / 2,
       y: (boundingBox.y1 + boundingBox.y2) / 2
     },
-    selectable: true,    // ✅ on peut cliquer
-    grabbable: true,     // ✅ on peut déplacer
-    locked: false        // ✅ libre
+    selectable: true,   
+    grabbable: true,     
+    locked: false        
   });
 
   cy.$id(idZone).style({
@@ -633,7 +623,7 @@ function creerZoneContour(type = "alliance") {
     'text-halign': 'center',
     'font-size': 14,
     'color': '#444',
-    'z-compound-depth': 'bottom' // 🔥 reste en arrière plan
+    'z-compound-depth': 'bottom' 
   });
 }
 
@@ -648,7 +638,7 @@ document.getElementById("submitToProfBtn").onclick = () => {
     return;
   }
 
-  const imageData = cy.png({ scale: 2, output: 'blob' }); // export Cytoscape en image
+  const imageData = cy.png({ scale: 2, output: 'blob' }); 
   const formData = new FormData();
   formData.append("image", imageData, "graph_informel.png");
   formData.append("id_utilisateur", userId);
@@ -679,7 +669,7 @@ document.getElementById("submitToProfBtn").onclick = () => {
 
 function supprimerZoneContour() {
   const selected = cy.nodes(":selected");
-  const zone = selected.filter(n => n.data('isZone') === true); // 🎯 Cible uniquement les vraies zones
+  const zone = selected.filter(n => n.data('isZone') === true); 
 
   if (zone.length === 0) {
     alert("Sélectionne une zone à supprimer (clic sur le bord d'une zone).");

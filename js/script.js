@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const menuDialog = document.getElementById("menuDialog");
 
     if (openMenu && menuDialog) {
-        // Toggle menu si on click
+        // Toggle menu on click
         openMenu.addEventListener("click", (e) => {
             e.stopPropagation();
             menuDialog.classList.toggle("show");

@@ -1,4 +1,3 @@
-/* ---- GLOBAL ---- */
 * {
     margin: 0;
     padding: 0;
@@ -6,7 +5,6 @@
     font-family: "Montserrat", sans-serif;
 }
 
-/* ---- BODY ---- */
 body {
     display: flex;
     flex-direction: column;
@@ -16,17 +14,16 @@ body {
     background: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(27,32,48,1)), 
                 url('https://thrivenextgen.com/wp-content/uploads/AdobeStock_162765779_45-scaled.webp') 
                 no-repeat center center/cover;
-    background-attachment: fixed; /* ✅ assure un rendu fixe et stable */
+    background-attachment: fixed; 
     background-size: cover;
-    padding-bottom: 100px; /* ✅ si besoin, espace pour le footer */
+    padding-bottom: 100px; 
 }
 
 
-/* ---- CONTAINER PRINCIPAL ---- */
 .container {
     background: rgba(27, 32, 48, 0.95);
     padding: 40px;
-    padding-bottom: 80px; /* ✅ Ajoute ceci */
+    padding-bottom: 80px; 
     border-radius: 15px;
     backdrop-filter: blur(12px);
     box-shadow: 0 8px 16px rgba(0,0,0,0.6);
@@ -38,7 +35,7 @@ body {
 }
 
 
-/* ---- TITRE DU TABLEAU ---- */
+
 h2 {
     text-align: center;
     color: #71aff6;
@@ -49,7 +46,6 @@ h2 {
     letter-spacing: 1px;
 }
 
-/* ---- TABLEAU ---- */
 .table {
     width: 100%;
     background: rgba(255, 255, 255, 0.05);
@@ -62,7 +58,6 @@ h2 {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }
 
-/* ---- EN-TÊTE DU TABLEAU ---- */
 .table thead {
     background: rgba(44, 62, 80, 0.95);
     color: white;
@@ -77,12 +72,10 @@ h2 {
     font-weight: bold;
 }
 
-/* ---- CORPS DU TABLEAU ---- */
 .table tbody tr {
     transition: background 0.3s ease-in-out;
 }
 
-/* Alternance des couleurs pour une meilleure lisibilité */
 .table tbody tr:nth-child(odd) {
     background-color: rgba(255, 255, 255, 0.08);
 }
@@ -91,7 +84,6 @@ h2 {
     background-color: rgba(255, 255, 255, 0.12);
 }
 
-/* ---- CELLULES ---- */
 .table td {
     padding: 14px;
     text-align: center;
@@ -99,13 +91,11 @@ h2 {
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* ---- EFFET DE SURVOL ---- */
 .table tbody tr:hover {
     background-color: rgba(255, 255, 255, 0.15);
     transition: background 0.3s ease-in-out;
 }
 
-/* ---- STYLE DES BOUTONS ---- */
 .btn {
     border-radius: 6px;
     font-weight: bold;
@@ -116,7 +106,6 @@ h2 {
     cursor: pointer;
 }
 
-/* ---- BOUTON "AJOUTER UN ACTEUR" ---- */
 .btn-primary {
     background: #71aff6;
     border: none;
@@ -128,7 +117,6 @@ h2 {
     transform: scale(1.05);
 }
 
-/* ---- BOUTON "GÉNÉRER L'ORGANIGRAMME" ---- */
 .btn-success {
     background: #2ecc71;
     border: none;
@@ -150,7 +138,6 @@ h2 {
     scrollbar-width: thin;
 }
 
-/* Scrollbar esthétique pour WebKit (Chrome, Edge, Safari) */
 .table-container::-webkit-scrollbar {
     height: 8px;
 }
