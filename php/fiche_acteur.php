@@ -16,7 +16,6 @@ if (!isset($_SESSION['id_utilisateur'])) {
 
 $id_utilisateur = $_SESSION['id_utilisateur'];
 
-// Vérifier que l'acteur appartient à l'utilisateur
 $stmt = $pdo->prepare("SELECT nom, prenom FROM acteur WHERE id_acteur = ? AND id_utilisateur = ?");
 $stmt->execute([$id_acteur, $id_utilisateur]);
 $acteur_info = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -28,7 +27,6 @@ if (!$acteur_info) {
 
 $nom_acteur = $acteur_info['prenom'] . ' ' . $acteur_info['nom'];
 
-// Relations informelles : source ou cible
 $stmt = $pdo->prepare("
   SELECT 
     a.nom AS nom_autre,
@@ -49,7 +47,6 @@ $stmt = $pdo->prepare("
 $stmt->execute(['id' => $id_acteur]);
 $relations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Calcul radar
 $radar_labels = [];
 $radar_data = [];
 $radar_colors = [];
@@ -58,10 +55,8 @@ foreach ($relations as $rel) {
   $estSource = $rel['id_acteur_source'] == $id_acteur;
   $nom_autre = $rel['prenom_autre'] . ' ' . $rel['nom_autre'];
 
-  // Impact dans le sens de l'acteur vers l'autre
   $impact = $estSource ? $rel['impact_source_vers_cible'] : $rel['impact_cible_vers_source'];
 
-  // Éviter doublons
   if (in_array($nom_autre, $radar_labels)) continue;
 
   $radar_labels[] = $nom_autre;

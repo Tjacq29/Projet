@@ -12,14 +12,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['mot_de_passe'])) {
-            //  Stocker l'utilisateur dans la session
             $_SESSION["id_utilisateur"] = $user['id_utilisateur']; 
             $_SESSION["nom"] = $user['nom'];
             $_SESSION["prenom"] = $user['prenom'];
             $_SESSION['role'] = $user['role']; 
 
 
-            //  Réponse JSON pour frontend
             echo json_encode([
                 "success" => true,
                 "userId" => $_SESSION["id_utilisateur"],
