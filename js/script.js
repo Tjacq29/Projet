@@ -39,13 +39,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const menuDialog = document.getElementById("menuDialog");
 
     if (openMenu && menuDialog) {
-        // Toggle menu on click
         openMenu.addEventListener("click", (e) => {
             e.stopPropagation();
             menuDialog.classList.toggle("show");
         });
 
-        // Fermer au clic hors du menu
         document.addEventListener("click", (e) => {
             const clickedOutside = !menuDialog.contains(e.target) && !openMenu.contains(e.target);
             if (menuDialog.classList.contains("show") && clickedOutside) {
@@ -53,7 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        // Fermer si on clique sur un lien dans le menu
         menuDialog.querySelectorAll("a").forEach(link => {
             link.addEventListener("click", () => {
                 menuDialog.classList.remove("show");

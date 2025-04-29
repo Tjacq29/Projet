@@ -1,4 +1,3 @@
-/* ---- GLOBAL ---- */
 * {
     margin: 0;
     padding: 0;
@@ -6,11 +5,10 @@
     font-family: "Montserrat", sans-serif;
 }
 
-/* ---- BODY ---- */
 body {
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Permet de placer le contenu et le footer correctement */
+    justify-content: space-between; 
     align-items: center;
     height: 100vh;
     background: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(27,32,48,1)),
@@ -18,7 +16,6 @@ body {
                 no-repeat center center/cover;
 }
 
-/* ---- HEADER ---- */
 .header {
     display: flex;
     align-items: center;
@@ -29,7 +26,6 @@ body {
     width: 100%;
 }
 
-/* Conteneur du header */
 .nav-container {
     display: flex;
     align-items: center;
@@ -38,7 +34,6 @@ body {
     max-width: 1200px;
 }
 
-/* ---- LOGO ORFI ENCADRÉ ---- */
 .logo {
     border: 2px solid white;
     border-radius: 3px;
@@ -53,13 +48,11 @@ body {
     color: white;
 }
 
-/* ---- MENU ---- */
-/* ---- MENU BURGER ---- */
 .menu {
     display: flex;
     width: 40px;
     height: 30px;
-    border: 2px solid white; /* Bordure blanche */
+    border: 2px solid white; 
     border-radius: 3px;
     justify-content: center;
     align-items: center;
@@ -68,54 +61,49 @@ body {
     transition: border 0.3s ease-in-out;
 }
 
-/* ---- BARRES DU MENU ---- */
 .menu:after {
     content: "";
     display: block;
     width: 20px;
     height: 3px;
-    background: white; /* Barres en blanc */
+    background: white; 
     position: absolute;
     margin: 0 auto;
     top: 5px;
     left: 0;
     right: 0;
     box-shadow:
-        0 8px white,  /* Barre du milieu */
-        0 16px white; /* Barre du bas */
+        0 8px white,  
+        0 16px white; 
     transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
-/* ---- EFFET HOVER : CHANGE LA COULEUR DES BARRES ---- */
 .menu:hover:after {
-    background: #8A2BE2; /* Violet (ou autre couleur que tu veux) */
+    background: #8A2BE2; 
     box-shadow:
         0 8px #8A2BE2,  
         0 16px #8A2BE2;
 }
 
 
-/* ---- CONTAINER LOGIN ---- */
 .login-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex: 1; /* Permet de centrer verticalement */
+    flex: 1; 
     width: 100%;
 }
 
-/* ---- BOX DE CONNEXION ---- */
+
 .login-box {
     background: rgba(27, 32, 48, 0.9);
     padding: 30px;
     width: 350px;
     border-radius: 10px;
-    /*backdrop-filter: blur(10px);*/
     box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     text-align: center;
 }
 
-/* ---- CHAMPS INPUT ---- */
 .input-group {
     margin-bottom: 15px;
     text-align: left;
@@ -139,7 +127,6 @@ body {
     outline: none;
 }
 
-/* ---- BOUTON ---- */
 .btn {
     width: 100%;
     padding: 10px;
@@ -157,7 +144,6 @@ body {
     transform: scale(1.05);
 }
 
-/* ---- TEXTE INSCRIPTION ---- */
 .signup-text {
     margin-top: 15px;
     font-size: 14px;
@@ -173,7 +159,6 @@ body {
     color: #fff;
 }
 
-/* ---- MENU DÉROULANT AU MILIEU ---- */
 dialog {
     display: flex;
     flex-direction: column;
@@ -215,7 +200,6 @@ dialog a:hover {
     color: #ddd;
 }
 
-/* ---- FOOTER BIEN EN BAS ---- */
 footer {
     background: #1B2030;
     color: #eee;
@@ -227,7 +211,7 @@ footer {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    margin-top: auto; /* Permet de garder le footer en bas */
+    margin-top: auto; 
 }
 
 .footer-content p {
@@ -250,37 +234,32 @@ footer {
     color: #fff;
     text-decoration: underline;
 }
- /* ---- TITRE CONNEXION ---- */
 h2 {
-    color: #ffffff !important; /* Assure que le texte est bien blanc */
+    color: #ffffff !important; 
     text-align: center;
     margin-bottom: 20px;
 }
 
-/* ---- OPTIONS ---- */
 .options {
     text-align: center;
     margin-bottom: 15px;
-    order: 2; /* Place cet élément en dernier dans le flux */
+    order: 2; 
 }
 
-/* ---- SIGNUP TEXT (S'INSCRIRE) ---- */
 .signup-text {
     text-align: center;
     font-size: 14px;
     color: #ccc;
     margin-bottom: 10px;
-    order: 1; /* Place cet élément avant "Mot de passe oublié" */
+    order: 1; 
 }
 
-/* ---- Réorganiser l'ordre des éléments ---- */
 form {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-/* ---- LIENS ---- */
 .options a,
 .signup-text a {
     color: #bbb;

@@ -12,7 +12,6 @@ html, body {
   }
   
   
-/* Conteneur principal */
 .container {
     background: rgba(27, 32, 48, 0.95);
     padding: 40px;
@@ -25,7 +24,6 @@ html, body {
     text-align: center;
   }
   
-  /* Titre */
   .container h2 {
     color: #71aff6;
     font-size: 28px;
@@ -34,12 +32,10 @@ html, body {
     letter-spacing: 1px;
   }
   
-  /* Scroll horizontal pour petits écrans */
   .table-container {
     overflow-x: auto;
   }
   
-  /* Style tableau */
   .table {
     width: 100%;
     border-collapse: collapse;
@@ -49,7 +45,6 @@ html, body {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
   }
   
-  /* En-têtes */
   .table thead {
     background: rgba(44, 62, 80, 0.95);
     color: white;
@@ -65,7 +60,6 @@ html, body {
     color: #ddd;
   }
   
-  /* Lignes alternées */
   .table tbody tr:nth-child(odd) {
     background-color: rgba(255, 255, 255, 0.06);
   }
@@ -74,12 +68,10 @@ html, body {
     background-color: rgba(255, 255, 255, 0.12);
   }
   
-  /* Survol */
   .table tbody tr:hover {
     background-color: rgba(255, 255, 255, 0.15);
   }
   
-  /* Liens */
   .table a {
     color: #71aff6;
     text-decoration: none;
@@ -90,7 +82,6 @@ html, body {
     text-decoration: underline;
   }
   
-  /* Bouton Supprimer */
   .table button {
     background: #e74c3c;
     color: white;
@@ -107,7 +98,6 @@ html, body {
     transform: scale(1.05);
   }
   
-  /* Responsive pour mobile */
   @media screen and (max-width: 768px) {
     .table th,
     .table td {

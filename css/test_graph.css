@@ -163,8 +163,8 @@ body {
   
   .popup {
     display: none;
-    position: absolute; /* IMPORTANT : pas fixed */
-    transform: translate(-50%, -100%); /* centré et au-dessus du clic */
+    position: absolute; 
+    transform: translate(-50%, -100%); 
     width: 300px;
     background-color: white;
     padding: 20px;
