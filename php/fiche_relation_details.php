@@ -1,5 +1,4 @@
 <?php
-// fiche_relation_details.php
 header('Content-Type: application/json');
 require_once('../php/config.php');
 session_start();
@@ -12,7 +11,6 @@ if ($id_acteur === 0 || !isset($_SESSION['id_utilisateur'])) {
 
 $id_utilisateur = $_SESSION['id_utilisateur'];
 
-// Vérification que l'acteur appartient bien à l'utilisateur co
 $stmt = $pdo->prepare("SELECT id_acteur FROM acteur WHERE id_acteur = ? AND id_utilisateur = ?");
 $stmt->execute([$id_acteur, $id_utilisateur]);
 if (!$stmt->fetch()) {
@@ -20,8 +18,7 @@ if (!$stmt->fetch()) {
   exit;
 }
 
-// Relations informelles
-// Relations informelles (source ou cible)
+
 $stmt = $pdo->prepare("
   SELECT 
     a.nom AS nom_autre,
@@ -60,7 +57,6 @@ $relations = array_map(function($r) use ($id_acteur) {
   ];
 }, $relations);
 
-// Relations hiérarchiques
 $stmt = $pdo->prepare("SELECT 
     a2.nom AS nom,
     a2.prenom AS prenom,
@@ -75,7 +71,6 @@ $stmt = $pdo->prepare("SELECT
 $stmt->execute([$id_acteur]);
 $hierarchies = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Adapter les hiérarchies à la même structure que les relations
 $hierarchies = array_map(function($r) {
   return [
     'nom_autre' => $r['prenom'] . ' ' . $r['nom'],
@@ -89,7 +84,6 @@ $hierarchies = array_map(function($r) {
   ];
 }, $hierarchies);
 
-// Fusionner proprement
 $all_relations = array_merge($relations, $hierarchies);
 
 

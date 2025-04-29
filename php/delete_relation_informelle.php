@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 session_start();
 include 'config.php';
 
-// Vérifie que l'utilisateur est connecté
+// Vérif que l'utilisateur est connecté
 if (!isset($_SESSION['id_utilisateur'])) {
     echo json_encode(["error" => "Utilisateur non connecté"]);
     exit();
@@ -13,7 +13,6 @@ if (!isset($_SESSION['id_utilisateur'])) {
 
 $id_utilisateur = $_SESSION['id_utilisateur'];
 
-// Vérifie que la requête est bien en POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(["error" => "Méthode non autorisée"]);
     exit();
@@ -22,7 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Récupère les données JSON envoyées
 $data = json_decode(file_get_contents("php://input"), true);
 
-// Vérifie que l'ID de la relation est présent
 if (!isset($data['id_relation_informelle'])) {
     echo json_encode(["error" => "ID de la relation manquant"]);
     exit();
@@ -31,7 +29,6 @@ if (!isset($data['id_relation_informelle'])) {
 $id_relation = $data['id_relation_informelle'];
 
 try {
-    // Supprimer uniquement si la relation appartient à l'utilisateur connecté
     $sql = "DELETE FROM relation_informelle 
             WHERE id_relation_informelle = ? AND id_utilisateur = ?";
     $stmt = $pdo->prepare($sql);
